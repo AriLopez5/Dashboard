@@ -64,3 +64,10 @@
 - API Keys para autenticación
 - IAM Roles con permisos mínimos
 - Datos encriptados en DynamoDB
+
+## 🌐 API Endpoints
+
+**Base URL:** `https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod`
+
+- `GET /gastos` - Listar todos los gastos
+- `POST /gastos` - Crear nuevo gasto
