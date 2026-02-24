@@ -16,9 +16,9 @@
 - [x] Repositorio GitHub
 
 ### Semanas 2-3 (24 Feb - 9 Mar): Infraestructura AWS
-- [ ] Crear tabla DynamoDB
-- [ ] Funciones Lambda básicas
-- [ ] API Gateway
+- [x] Crear tabla DynamoDB
+- [x] Funciones Lambda básicas
+- [x] API Gateway
 
 ### Semana 4-5 (10-23 Mar): Frontend básico
 - [ ] Formulario añadir gastos
