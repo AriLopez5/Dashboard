@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Personal - Gastos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>💰 Dashboard Personal</h1>
+            <p class="subtitle">Control de Gastos</p>
+        </header>
+
+        <!-- Resumen Total -->
+        <div class="total-card">
+            <h2>Total Gastado</h2>
+            <p class="total-amount" id="totalAmount">0.00 €</p>
+            <p class="total-count" id="totalCount">0 gastos registrados</p>
+        </div>
+
+        <!-- Formulario Nuevo Gasto -->
+        <div class="card">
+            <h2>➕ Añadir Nuevo Gasto</h2>
+            <form id="formGasto">
+                <div class="form-group">
+                    <label for="cantidad">Cantidad (€)</label>
+                    <input 
+                        type="number" 
+                        id="cantidad" 
+                        step="0.01" 
+                        placeholder="15.50" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" required>
+                        <option value="">-- Selecciona una categoría --</option>
+                        <option value="alimentacion">🍔 Alimentación</option>
+                        <option value="transporte">🚗 Transporte</option>
+                        <option value="ocio">🎮 Ocio</option>
+                        <option value="deporte">💪 Deporte</option>
+                        <option value="salud">🏥 Salud</option>
+                        <option value="otros">📦 Otros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción (opcional)</label>
+                    <input 
+                        type="text" 
+                        id="descripcion" 
+                        placeholder="Ej: Menú del día"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input 
+                        type="date" 
+                        id="fecha" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">Añadir Gasto</button>
+            </form>
+        </div>
+
+        <!-- Lista de Gastos -->
+        <div class="card">
+            <h2>📋 Mis Gastos</h2>
+            
+            <!-- Filtros -->
+            <div class="filters">
+                <select id="filtroCategoria">
+                    <option value="">Todas las categorías</option>
+                    <option value="alimentacion">🍔 Alimentación</option>
+                    <option value="transporte">🚗 Transporte</option>
+                    <option value="ocio">🎮 Ocio</option>
+                    <option value="deporte">💪 Deporte</option>
+                    <option value="salud">🏥 Salud</option>
+                    <option value="otros">📦 Otros</option>
+                </select>
+            </div>
+
+            <!-- Spinner de carga -->
+            <div id="loading" class="loading" style="display: none;">
+                Cargando gastos...
+            </div>
+
+            <!-- Mensaje si no hay gastos -->
+            <div id="emptyMessage" class="empty-message" style="display: none;">
+                No hay gastos registrados. ¡Añade tu primer gasto arriba! 👆
+            </div>
+
+            <!-- Lista -->
+            <div id="listaGastos" class="gastos-list">
+                <!-- Los gastos se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
