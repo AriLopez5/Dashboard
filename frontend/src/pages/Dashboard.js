@@ -1,4 +1,8 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import GastosPorCategoria from '../components/GastosPorCategoria';
+import EvolucionGastos from '../components/EvolucionGastos';
+import EntrenamientosPorTipo from '../components/EntrenamientosPorTipo';
+import ComparativaMensual from '../components/ComparativaMensual';
 
 function Dashboard({ gastos, entrenamientos, loading }) {
   
@@ -26,7 +30,7 @@ function Dashboard({ gastos, entrenamientos, loading }) {
     { name: 'Entrenamientos', value: cantidadEntrenamientos, color: '#f38181' }
   ];
 
-  // Gastos por categoría
+  // Gastos por categoría para el top
   const gastosPorCategoria = gastos.reduce((acc, gasto) => {
     const cat = gasto.categoria || 'otros';
     acc[cat] = (acc[cat] || 0) + parseFloat(gasto.cantidad);
@@ -61,92 +65,71 @@ function Dashboard({ gastos, entrenamientos, loading }) {
 
       </div>
 
-      {/* Gráfica Circular */}
-      <div className="chart-container">
-        <h2>📊 Distribución de Actividad</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={dataGrafica}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-              outerRadius={100}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {dataGrafica.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+      {/* Comparativa Mensual */}
+      <ComparativaMensual gastos={gastos} entrenamientos={entrenamientos} />
 
-      {/* Top Categorías de Gastos */}
-      {topCategorias.length > 0 && (
-        <div className="card">
-          <h2>🔝 Top Categorías de Gastos</h2>
-          <div style={{ marginTop: '20px' }}>
-            {topCategorias.map(([categoria, total], index) => (
-              <div 
-                key={categoria} 
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '15px',
-                  background: index % 2 === 0 ? '#f8f9fa' : 'white',
-                  borderRadius: '8px',
-                  marginBottom: '10px'
-                }}
-              >
-                <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
-                  {index + 1}. {categoria}
-                </span>
-                <span style={{ color: '#667eea', fontWeight: 'bold' }}>
-                  {total.toFixed(2)} €
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Últimos Registros */}
-      <div className="card">
-        <h2>📝 Últimos Registros</h2>
+      {/* Gráficas principales */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
         
-        {/* Últimos gastos */}
-        <h3 style={{ marginTop: '20px', marginBottom: '10px', color: '#667eea' }}>
-          💰 Últimos Gastos
-        </h3>
-        {gastos.slice(0, 3).map(gasto => (
-          <div key={gasto.id} className={`item ${gasto.categoria}`} style={{ marginBottom: '10px' }}>
-            <div className="item-info">
-              <div className="item-categoria">{gasto.categoria}</div>
-              <div className="item-descripcion">{gasto.descripcion || 'Sin descripción'}</div>
-            </div>
-            <div className="item-cantidad">{parseFloat(gasto.cantidad).toFixed(2)} €</div>
-          </div>
-        ))}
+        {/* Gráfica circular original */}
+        <div className="chart-container">
+          <h2>📊 Distribución de Actividad</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={dataGrafica}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {dataGrafica.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
 
-        {/* Últimos entrenamientos */}
-        <h3 style={{ marginTop: '30px', marginBottom: '10px', color: '#f38181' }}>
-          💪 Últimos Entrenamientos
-        </h3>
-        {entrenamientos.slice(0, 3).map(entrenamiento => (
-          <div key={entrenamiento.id} className={`item ${entrenamiento.tipo.toLowerCase()}`} style={{ marginBottom: '10px' }}>
-            <div className="item-info">
-              <div className="item-categoria">{entrenamiento.tipo}</div>
-              <div className="item-descripcion">{entrenamiento.ejercicios}</div>
+        {/* Top categorías */}
+        {topCategorias.length > 0 && (
+          <div className="chart-container">
+            <h2>🔝 Top Categorías</h2>
+            <div style={{ marginTop: '40px' }}>
+              {topCategorias.map(([categoria, total], index) => (
+                <div 
+                  key={categoria} 
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '15px',
+                    background: index % 2 === 0 ? '#f8f9fa' : 'white',
+                    borderRadius: '8px',
+                    marginBottom: '10px'
+                  }}
+                >
+                  <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
+                    {index + 1}. {categoria}
+                  </span>
+                  <span style={{ color: '#667eea', fontWeight: 'bold' }}>
+                    {total.toFixed(2)} €
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="item-cantidad">{entrenamiento.duracion} min</div>
           </div>
-        ))}
+        )}
       </div>
+
+      {/* Gráficas avanzadas */}
+      <GastosPorCategoria gastos={gastos} />
+      <EvolucionGastos gastos={gastos} />
+      <EntrenamientosPorTipo entrenamientos={entrenamientos} />
     </div>
   );
 }
