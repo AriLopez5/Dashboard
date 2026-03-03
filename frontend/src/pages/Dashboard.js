@@ -42,7 +42,7 @@ function Dashboard({ gastos, entrenamientos, loading }) {
     .slice(0, 3);
 
   return (
-    <div>
+    <div className="dashboard">
       {/* Header */}
       <div className="page-header">
         <h1>🏠 Dashboard</h1>
@@ -50,7 +50,7 @@ function Dashboard({ gastos, entrenamientos, loading }) {
       </div>
 
       {/* Estadísticas */}
-      <div className="stats-grid">
+      <div className="stats-container">
         <div className="stat-card">
           <h3>💰 Total Gastado</h3>
           <div className="stat-value">{totalGastos.toFixed(2)} €</div>
@@ -65,13 +65,12 @@ function Dashboard({ gastos, entrenamientos, loading }) {
 
       </div>
 
-      {/* Comparativa Mensual */}
+{/* Comparativa Mensual - Ancho completo */}
       <ComparativaMensual gastos={gastos} entrenamientos={entrenamientos} />
 
-      {/* Gráficas principales */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
-        
-        {/* Gráfica circular original */}
+      {/* Grid responsive 2 columnas en pantallas grandes */}
+        <div className="grid-two-columns">
+        {/* Gráfica circular */}
         <div className="chart-container">
           <h2>📊 Distribución de Actividad</h2>
           <ResponsiveContainer width="100%" height={300}>
@@ -126,10 +125,14 @@ function Dashboard({ gastos, entrenamientos, loading }) {
         )}
       </div>
 
-      {/* Gráficas avanzadas */}
-      <GastosPorCategoria gastos={gastos} />
+      {/* Gráficas de barras - 2 columnas en pantallas grandes */}
+    <div className="grid-two-columns">
+        <GastosPorCategoria gastos={gastos} />
+        <EntrenamientosPorTipo entrenamientos={entrenamientos} />
+      </div>
+
+      {/* Evolución temporal - Ancho completo */}
       <EvolucionGastos gastos={gastos} />
-      <EntrenamientosPorTipo entrenamientos={entrenamientos} />
     </div>
   );
 }

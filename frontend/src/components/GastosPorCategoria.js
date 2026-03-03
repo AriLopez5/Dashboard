@@ -1,8 +1,22 @@
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { parseISO, startOfMonth, endOfMonth } from 'date-fns';
+import SelectorMes from './SelectorMes';
 
 function GastosPorCategoria({ gastos }) {
+  const [mesSeleccionado, setMesSeleccionado] = useState(new Date());
+
+  const inicioMes = startOfMonth(mesSeleccionado);
+  const finMes = endOfMonth(mesSeleccionado);
+
+  // Filtrar gastos del mes seleccionado
+  const gastosDelMes = gastos.filter(g => {
+    const fecha = parseISO(g.fecha);
+    return fecha >= inicioMes && fecha <= finMes;
+  });
+
   // Calcular gastos por categoría
-  const gastosPorCategoria = gastos.reduce((acc, gasto) => {
+  const gastosPorCategoria = gastosDelMes.reduce((acc, gasto) => {
     const cat = gasto.categoria || 'otros';
     acc[cat] = (acc[cat] || 0) + parseFloat(gasto.cantidad);
     return acc;
@@ -33,7 +47,7 @@ function GastosPorCategoria({ gastos }) {
     .map(([categoria, total]) => ({
       categoria: `${emojis[categoria]} ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`,
       total: parseFloat(total.toFixed(2)),
-      color: colores[categoria]
+      fill: colores[categoria]
     }))
     .sort((a, b) => b.total - a.total);
 
@@ -41,8 +55,12 @@ function GastosPorCategoria({ gastos }) {
     return (
       <div className="chart-container">
         <h2>📊 Gastos por Categoría</h2>
+        <SelectorMes 
+          mesSeleccionado={mesSeleccionado} 
+          onCambiarMes={setMesSeleccionado}
+        />
         <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-          No hay datos suficientes para mostrar
+          No hay datos para este mes
         </p>
       </div>
     );
@@ -51,17 +69,46 @@ function GastosPorCategoria({ gastos }) {
   return (
     <div className="chart-container">
       <h2>📊 Gastos por Categoría</h2>
+      
+      <SelectorMes 
+        mesSeleccionado={mesSeleccionado} 
+        onCambiarMes={setMesSeleccionado}
+      />
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="categoria" />
           <YAxis />
-          <Tooltip 
-            formatter={(value) => `${value.toFixed(2)} €`}
-            contentStyle={{ background: '#fff', border: '1px solid #ccc' }}
-          />
+        <Tooltip 
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              const data = payload[0];
+              return (
+                <div style={{
+                  background: 'white',
+                  padding: '10px',
+                  border: '1px solid #ccc',
+                  borderRadius: '5px'
+                }}>
+                  <p style={{ margin: 0, fontWeight: 'bold' }}>
+                    {data.payload.categoria}
+                  </p>
+                  <p style={{ margin: '5px 0 0 0', color: '#667eea' }}>
+                    {data.value.toFixed(2)} €
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          }}
+        />
           <Legend />
-          <Bar dataKey="total" fill="#667eea" name="Gasto (€)" />
+          <Bar dataKey="total" name="Gasto (€)">
+            {data.map((entry, index) => (
+              <Bar key={`bar-${index}`} dataKey="total" fill={entry.fill} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

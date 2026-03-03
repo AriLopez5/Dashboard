@@ -1,18 +1,26 @@
+import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
+import SelectorMes from './SelectorMes';
 
 function EvolucionGastos({ gastos }) {
-  // Obtener fecha actual
-  const hoy = new Date();
-  const inicioMes = startOfMonth(hoy);
-  const finMes = endOfMonth(hoy);
+  const [mesSeleccionado, setMesSeleccionado] = useState(new Date());
+
+  const inicioMes = startOfMonth(mesSeleccionado);
+  const finMes = endOfMonth(mesSeleccionado);
 
   // Crear array con todos los días del mes
   const diasDelMes = eachDayOfInterval({ start: inicioMes, end: finMes });
 
+  // Filtrar gastos del mes seleccionado
+  const gastosDelMes = gastos.filter(g => {
+    const fecha = parseISO(g.fecha);
+    return fecha >= inicioMes && fecha <= finMes;
+  });
+
   // Agrupar gastos por día
-  const gastosPorDia = gastos.reduce((acc, gasto) => {
+  const gastosPorDia = gastosDelMes.reduce((acc, gasto) => {
     const fecha = gasto.fecha;
     acc[fecha] = (acc[fecha] || 0) + parseFloat(gasto.cantidad);
     return acc;
@@ -34,7 +42,13 @@ function EvolucionGastos({ gastos }) {
 
   return (
     <div className="chart-container">
-      <h2>📈 Evolución de Gastos - {format(hoy, 'MMMM yyyy', { locale: es })}</h2>
+      <h2>📈 Evolución de Gastos</h2>
+      
+      <SelectorMes 
+        mesSeleccionado={mesSeleccionado} 
+        onCambiarMes={setMesSeleccionado}
+      />
+
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -63,6 +77,34 @@ function EvolucionGastos({ gastos }) {
           />
         </LineChart>
       </ResponsiveContainer>
+
+      {/* Resumen del mes */}
+      <div style={{
+        marginTop: '20px',
+        display: 'flex',
+        justifyContent: 'space-around',
+        flexWrap: 'wrap',
+        gap: '15px'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.9rem', color: '#666' }}>Total del mes</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>
+            {acumulado.toFixed(2)} €
+          </div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.9rem', color: '#666' }}>Gastos registrados</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>
+            {gastosDelMes.length}
+          </div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.9rem', color: '#666' }}>Promedio diario</div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#667eea' }}>
+            {(acumulado / diasDelMes.length).toFixed(2)} €
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

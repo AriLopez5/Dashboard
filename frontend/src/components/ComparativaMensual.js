@@ -58,12 +58,12 @@ function ComparativaMensual({ gastos, entrenamientos }) {
     <div className="card">
       <h2>📉 Comparativa Mensual</h2>
       
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: '20px',
-        marginTop: '20px' 
-      }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '20px',
+          marginTop: '20px' 
+        }}>
         {/* Gastos */}
         <div style={{ 
           background: '#f8f9fa', 

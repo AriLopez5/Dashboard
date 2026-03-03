@@ -1,8 +1,22 @@
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { parseISO, startOfMonth, endOfMonth } from 'date-fns';
+import SelectorMes from './SelectorMes';
 
 function EntrenamientosPorTipo({ entrenamientos }) {
+  const [mesSeleccionado, setMesSeleccionado] = useState(new Date());
+
+  const inicioMes = startOfMonth(mesSeleccionado);
+  const finMes = endOfMonth(mesSeleccionado);
+
+  // Filtrar entrenamientos del mes seleccionado
+  const entrenamientosDelMes = entrenamientos.filter(e => {
+    const fecha = parseISO(e.fecha);
+    return fecha >= inicioMes && fecha <= finMes;
+  });
+
   // Calcular entrenamientos por tipo
-  const entrenamientosPorTipo = entrenamientos.reduce((acc, entrenamiento) => {
+  const entrenamientosPorTipo = entrenamientosDelMes.reduce((acc, entrenamiento) => {
     const tipo = entrenamiento.tipo || 'Otro';
     if (!acc[tipo]) {
       acc[tipo] = {
@@ -37,8 +51,12 @@ function EntrenamientosPorTipo({ entrenamientos }) {
     return (
       <div className="chart-container">
         <h2>🏋️ Entrenamientos por Tipo</h2>
+        <SelectorMes 
+          mesSeleccionado={mesSeleccionado} 
+          onCambiarMes={setMesSeleccionado}
+        />
         <p style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-          No hay datos suficientes para mostrar
+          No hay datos para este mes
         </p>
       </div>
     );
@@ -47,6 +65,12 @@ function EntrenamientosPorTipo({ entrenamientos }) {
   return (
     <div className="chart-container">
       <h2>🏋️ Entrenamientos por Tipo</h2>
+      
+      <SelectorMes 
+        mesSeleccionado={mesSeleccionado} 
+        onCambiarMes={setMesSeleccionado}
+      />
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
