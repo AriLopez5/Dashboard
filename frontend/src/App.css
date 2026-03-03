@@ -11,7 +11,8 @@
   padding: 20px;
   margin-left: 250px;
   transition: margin-left 0.3s;
-  width: calc(100vw - 250px); /* Ancho total menos el sidebar */
+  width: calc(100vw - 250px);
+  /* Ancho total menos el sidebar */
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -46,9 +47,11 @@
   padding: 25px;
   margin-bottom: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 100%; /* Asegurar ancho completo */
+  width: 100%;
+  /* Asegurar ancho completo */
   box-sizing: border-box;
 }
+
 .chart-container {
   background: white;
   border-radius: 15px;
@@ -56,7 +59,8 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   margin-bottom: 0;
   min-height: 400px;
-  width: 100%; /* Asegurar ancho completo */
+  width: 100%;
+  /* Asegurar ancho completo */
   box-sizing: border-box;
 }
 
@@ -257,19 +261,50 @@
 }
 
 /* Colores por categoría */
-.item.alimentacion { border-left-color: #ff6b6b; }
-.item.transporte { border-left-color: #4ecdc4; }
-.item.ocio { border-left-color: #95e1d3; }
-.item.deporte { border-left-color: #f38181; }
-.item.salud { border-left-color: #aa96da; }
-.item.otros { border-left-color: #fcbad3; }
+.item.alimentacion {
+  border-left-color: #ff6b6b;
+}
+
+.item.transporte {
+  border-left-color: #4ecdc4;
+}
+
+.item.ocio {
+  border-left-color: #95e1d3;
+}
+
+.item.deporte {
+  border-left-color: #f38181;
+}
+
+.item.salud {
+  border-left-color: #aa96da;
+}
+
+.item.otros {
+  border-left-color: #fcbad3;
+}
 
 /* Tipos de entrenamiento */
-.item.gimnasio { border-left-color: #f38181; }
-.item.cardio { border-left-color: #4ecdc4; }
-.item.yoga { border-left-color: #aa96da; }
-.item.natacion { border-left-color: #4ecdc4; }
-.item.otro { border-left-color: #95e1d3; }
+.item.gimnasio {
+  border-left-color: #f38181;
+}
+
+.item.cardio {
+  border-left-color: #4ecdc4;
+}
+
+.item.yoga {
+  border-left-color: #aa96da;
+}
+
+.item.natacion {
+  border-left-color: #4ecdc4;
+}
+
+.item.otro {
+  border-left-color: #95e1d3;
+}
 
 /* Loading y mensajes */
 .loading {
@@ -320,16 +355,16 @@
   .page-header h1 {
     font-size: 2rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .item-cantidad {
     margin-top: 10px;
     align-self: flex-end;
@@ -344,7 +379,8 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
   min-height: 400px;
-  width: 100%; /* IMPORTANTE: Asegurar que ocupe todo el ancho */
+  width: 100%;
+  /* IMPORTANTE: Asegurar que ocupe todo el ancho */
 }
 
 .chart-container h2 {
@@ -355,6 +391,7 @@
 
 /* Responsive mejorado */
 @media (max-width: 1024px) {
+
   /* En tablets, forzar 1 columna si la pantalla es menor a 1024px */
   .dashboard-grid-2 {
     grid-template-columns: 1fr;
@@ -407,7 +444,8 @@
 /* Dashboard - ancho completo */
 .dashboard {
   width: 100%;
-  max-width: none; /* Cambiar de 100% a none */
+  max-width: none;
+  /* Cambiar de 100% a none */
 }
 
 /* Eliminar restricciones de ancho */
@@ -425,7 +463,7 @@
   flex-wrap: wrap;
 }
 
-.grid-two-columns > * {
+.grid-two-columns>* {
   flex: 1 1 calc(50% - 10px);
   min-width: 0;
   max-width: 100%;
@@ -440,20 +478,20 @@
   width: 100%;
 }
 
-.stats-container > * {
+.stats-container>* {
   flex: 1;
   min-width: 250px;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .grid-two-columns > * {
+  .grid-two-columns>* {
     flex: 1 1 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .stats-container > * {
+  .stats-container>* {
     flex: 1 1 100%;
   }
 }

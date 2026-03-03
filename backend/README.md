@@ -28,43 +28,43 @@ backend/
 - **Endpoint:** `POST /gastos`
 - **Descripción:** Crea un nuevo gasto en DynamoDB
 - **Tabla:** `gastos`
-- **Runtime:** Python 3.12
 
 #### 2. listar_gastos
 - **Endpoint:** `GET /gastos`
 - **Descripción:** Lista todos los gastos guardados
 - **Tabla:** `gastos`
-- **Runtime:** Python 3.12
+
+#### 3. actualizar_gasto ✨ NUEVO
+- **Endpoint:** `PUT /gastos/{id}`
+- **Descripción:** Actualiza un gasto existente
+- **Tabla:** `gastos`
+
+#### 4. eliminar_gasto ✨ NUEVO
+- **Endpoint:** `DELETE /gastos/{id}`
+- **Descripción:** Elimina un gasto
+- **Tabla:** `gastos`
 
 ### Módulo Deporte
 
-#### 3. crear_entrenamiento
+#### 5. crear_entrenamiento
 - **Endpoint:** `POST /entrenamientos`
 - **Descripción:** Crea un nuevo entrenamiento en DynamoDB
 - **Tabla:** `deporte`
-- **Runtime:** Python 3.12
 
-#### 4. listar_entrenamientos
+#### 6. listar_entrenamientos
 - **Endpoint:** `GET /entrenamientos`
 - **Descripción:** Lista todos los entrenamientos guardados
 - **Tabla:** `deporte`
-- **Runtime:** Python 3.12
 
-## Despliegue
+#### 7. actualizar_entrenamiento ✨ NUEVO
+- **Endpoint:** `PUT /entrenamientos/{id}`
+- **Descripción:** Actualiza un entrenamiento existente
+- **Tabla:** `deporte`
 
-Actualmente las Lambdas se despliegan manualmente desde la consola AWS.
-
-En la Semana 12 se implementará CI/CD con GitHub Actions para despliegue automático.
-
-## Permisos IAM
-
-Todas las Lambdas necesitan:
-- Política: `AmazonDynamoDBFullAccess`
-- Región: `eu-north-1` (Estocolmo)
-
-### Tablas DynamoDB
-- `gastos` - Para funciones de gastos
-- `deporte` - Para funciones de entrenamientos
+#### 8. eliminar_entrenamiento ✨ NUEVO
+- **Endpoint:** `DELETE /entrenamientos/{id}`
+- **Descripción:** Elimina un entrenamiento
+- **Tabla:** `deporte`
 
 ## Última actualización
-27 Febrero 2026
+03 Febrero 2026 - CRUD completo implementado
