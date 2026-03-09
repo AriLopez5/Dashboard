@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -15,16 +15,16 @@ function App() {
   const [entrenamientos, setEntrenamientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'success' });
-  
+
   // Función para cargar todos los datos
-  const cargarTodosDatos = async () => {
+  const cargarTodosDatos = useCallback(async () => {
     await Promise.all([cargarGastos(), cargarEntrenamientos()]);
-  };
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     cargarTodosDatos();
-  }, []);
+  }, [cargarTodosDatos]);
 
   // Función para cargar gastos
   const cargarGastos = async () => {
