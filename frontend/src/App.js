@@ -15,16 +15,16 @@ function App() {
   const [entrenamientos, setEntrenamientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'success' });
+  
+  // Función para cargar todos los datos
+  const cargarTodosDatos = async () => {
+    await Promise.all([cargarGastos(), cargarEntrenamientos()]);
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     cargarTodosDatos();
   }, []);
-
-  // Función para cargar todos los datos
-  const cargarTodosDatos = async () => {
-    await Promise.all([cargarGastos(), cargarEntrenamientos()]);
-  };
 
   // Función para cargar gastos
   const cargarGastos = async () => {
