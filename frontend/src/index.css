@@ -1,13 +1,11 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  background: #F7F6F3;
   min-height: 100vh;
-  padding: 0;
-  /* Cambiar de 20px a 0 */
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
 }
