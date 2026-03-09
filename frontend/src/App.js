@@ -16,7 +16,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'success' });
 
-  // Cargar datos al iniciar
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     cargarTodosDatos();
   }, []);

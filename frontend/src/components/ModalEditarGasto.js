@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function ModalEditarGasto({ gasto, onClose, onGuardar }) {
     const [cantidad, setCantidad] = useState(gasto.cantidad);
