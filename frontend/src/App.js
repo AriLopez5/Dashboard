@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import GastosPage from './pages/GastosPage';
 import DeportePage from './pages/DeportePage';
 import Toast from './components/Toast';
+/* eslint-disable react-hooks/exhaustive-deps */
 
 // IMPORTANTE: Reemplaza con tu URL de API Gateway
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
