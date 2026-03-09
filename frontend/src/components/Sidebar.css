@@ -1,75 +1,119 @@
+/* ── Sidebar — Paleta Pastel ──────────────────────────────── */
 .sidebar {
   width: 250px;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: #FFFFFF;
+  border-right: 1px solid #EBEBEB;
   height: 100vh;
   position: fixed;
   left: 0;
   top: 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
 
+/* Header */
 .sidebar-header {
-  padding: 30px 20px;
-  text-align: center;
-  color: white;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 32px 24px 24px;
+  border-bottom: 1px solid #EBEBEB;
 }
 
 .sidebar-header h2 {
-  font-size: 1.8rem;
-  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -0.02em;
+  margin-bottom: 2px;
 }
 
 .sidebar-header p {
-  font-size: 0.9rem;
-  opacity: 0.8;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #B0B0B0;
 }
 
+/* Nav */
 .sidebar-nav {
   flex: 1;
-  padding: 20px 0;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 15px 25px;
-  color: white;
+  gap: 12px;
+  padding: 11px 14px;
+  color: #6B6B6B;
   text-decoration: none;
-  transition: all 0.3s;
-  border-left: 4px solid transparent;
+  border-radius: 10px;
+  border-left: none;
+  transition: background 0.15s, color 0.15s;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-left-color: white;
+  background: #F7F6F3;
+  color: #1A1A1A;
 }
 
+/* Activo — cada ruta con su color pastel */
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.2);
-  border-left-color: white;
-  font-weight: 600;
+  font-weight: 700;
+  border-left: none;
+}
+
+/* Dashboard → menta */
+.nav-link[href="/"].active,
+.nav-link[to="/"].active {
+  background: #D8F3DC;
+  color: #2D6A4F;
+}
+
+/* Gastos → melocotón */
+.nav-link[href="/gastos"].active,
+.nav-link[to="/gastos"].active {
+  background: #FDE8E1;
+  color: #E76F51;
+}
+
+/* Deporte → lavanda */
+.nav-link[href="/deporte"].active,
+.nav-link[to="/deporte"].active {
+  background: #EDE3FC;
+  color: #8338EC;
+}
+
+/* Fallback activo genérico */
+.nav-link.active:not([href="/"]):not([href="/gastos"]):not([href="/deporte"]) {
+  background: #D8F3DC;
+  color: #2D6A4F;
 }
 
 .nav-icon {
-  font-size: 1.5rem;
-  margin-right: 15px;
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .nav-text {
-  font-size: 1.1rem;
+  font-size: 14px;
+  font-weight: 500;
 }
 
+/* Footer */
 .sidebar-footer {
-  padding: 20px;
-  text-align: center;
-  color: white;
-  opacity: 0.6;
-  font-size: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px 24px;
+  border-top: 1px solid #EBEBEB;
+  color: #B0B0B0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* Responsive */
