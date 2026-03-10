@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
 
 function Sidebar() {
   const [abierto, setAbierto] = useState(false);
-  const location = useLocation();
 
   // Cerrar sidebar al navegar en móvil
   const handleNavClick = () => {
