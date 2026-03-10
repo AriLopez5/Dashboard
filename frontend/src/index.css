@@ -1,11 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 
+:root {
+    --bg-main: #F7F6F3;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
-  background: #F7F6F3;
+  background-color: var(--bg-main);
   min-height: 100vh;
   color: #1A1A1A;
   -webkit-font-smoothing: antialiased;
+}
+body.tema-oscuro {
+    color: #F0F0F0;
+}
+
+body.tema-oscuro .day-group,
+body.tema-oscuro .item,
+body.tema-oscuro .stat-card,
+body.tema-oscuro .page-header h1,
+body.tema-oscuro .page-header p,
+body.tema-oscuro .day-date,
+body.tema-oscuro .item-descripcion,
+body.tema-oscuro .item-cantidad {
+    color: #F0F0F0;
 }

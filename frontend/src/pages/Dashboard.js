@@ -19,19 +19,16 @@ function Dashboard({ gastos, entrenamientos, loading }) {
         );
     }
 
-    // Calcular totales
     const totalGastos = gastos.reduce((sum, g) => sum + parseFloat(g.cantidad), 0);
     const cantidadGastos = gastos.length;
     const cantidadEntrenamientos = entrenamientos.length;
     const minutosEntrenamiento = entrenamientos.reduce((sum, e) => sum + (e.duracion || 0), 0);
 
-    // Datos para la gráfica circular
     const dataGrafica = [
         { name: 'Gastos', value: cantidadGastos, color: '#667eea' },
         { name: 'Entrenamientos', value: cantidadEntrenamientos, color: '#f38181' }
     ];
 
-    // Gastos por categoría para el top
     const gastosPorCategoria = gastos.reduce((acc, gasto) => {
         const cat = gasto.categoria || 'otros';
         acc[cat] = (acc[cat] || 0) + parseFloat(gasto.cantidad);
@@ -49,67 +46,38 @@ function Dashboard({ gastos, entrenamientos, loading }) {
                 <h1>🏠 Dashboard</h1>
                 <p className="page-subtitle">Visión general de tu actividad</p>
             </div>
-            {/* Botones de exportación rápida */}
-            <div style={{
-                display: 'flex',
-                gap: '10px',
-                marginBottom: '20px',
-                flexWrap: 'wrap'
-            }}>
-                <button
-                    onClick={() => exportarGastosCSV(gastos)}
-                    style={{
-                        padding: '10px 20px',
-                        background: '#4caf50',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '600'
-                    }}
-                >
+
+            {/* Botones exportación */}
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+                <button onClick={() => exportarGastosCSV(gastos)} className="btn-primary">
                     📥 Exportar Gastos ({gastos.length})
                 </button>
-
-                <button
-                    onClick={() => exportarEntrenamientosCSV(entrenamientos)}
-                    style={{
-                        padding: '10px 20px',
-                        background: '#4caf50',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '600'
-                    }}
-                >
+                <button onClick={() => exportarEntrenamientosCSV(entrenamientos)} className="btn-primary">
                     📥 Exportar Entrenamientos ({entrenamientos.length})
                 </button>
             </div>
-            {/* Estadísticas */}
+
+            {/* Stat cards */}
             <div className="stats-container">
                 <div className="stat-card">
                     <h3>💰 Total Gastado</h3>
                     <div className="stat-value">{totalGastos.toFixed(2)} €</div>
                     <div className="stat-label">{cantidadGastos} gastos</div>
                 </div>
-
                 <div className="stat-card">
                     <h3>💪 Entrenamientos</h3>
                     <div className="stat-value">{cantidadEntrenamientos}</div>
                     <div className="stat-label">{minutosEntrenamiento} minutos</div>
                 </div>
-
             </div>
 
-            {/* Comparativa Mensual - Ancho completo */}
-            <ComparativaMensual gastos={gastos} entrenamientos={entrenamientos} />
+            {/* Comparativa Mensual */}
+            <div style={{ marginBottom: '20px' }}>
+                <ComparativaMensual gastos={gastos} entrenamientos={entrenamientos} />
+            </div>
 
-            {/* Grid responsive 2 columnas en pantallas grandes */}
+            {/* Distribución + Top Categorías */}
             <div className="grid-two-columns">
-                {/* Gráfica circular */}
                 <div className="chart-container">
                     <h2>📊 Distribución de Actividad</h2>
                     <ResponsiveContainer width="100%" height={300}>
@@ -121,7 +89,6 @@ function Dashboard({ gastos, entrenamientos, loading }) {
                                 labelLine={false}
                                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                                 outerRadius={100}
-                                fill="#8884d8"
                                 dataKey="value"
                             >
                                 {dataGrafica.map((entry, index) => (
@@ -134,29 +101,14 @@ function Dashboard({ gastos, entrenamientos, loading }) {
                     </ResponsiveContainer>
                 </div>
 
-                {/* Top categorías */}
                 {topCategorias.length > 0 && (
                     <div className="chart-container">
                         <h2>🔝 Top Categorías</h2>
-                        <div style={{ marginTop: '40px' }}>
+                        <div style={{ marginTop: '20px' }}>
                             {topCategorias.map(([categoria, total], index) => (
-                                <div
-                                    key={categoria}
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        padding: '15px',
-                                        background: index % 2 === 0 ? '#f8f9fa' : 'white',
-                                        borderRadius: '8px',
-                                        marginBottom: '10px'
-                                    }}
-                                >
-                                    <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
-                                        {index + 1}. {categoria}
-                                    </span>
-                                    <span style={{ color: '#667eea', fontWeight: 'bold' }}>
-                                        {total.toFixed(2)} €
-                                    </span>
+                                <div key={categoria} className="top-cat-item">
+                                    <span className="top-cat-nombre">{index + 1}. {categoria}</span>
+                                    <span className="top-cat-valor">{total.toFixed(2)} €</span>
                                 </div>
                             ))}
                         </div>
@@ -164,13 +116,13 @@ function Dashboard({ gastos, entrenamientos, loading }) {
                 )}
             </div>
 
-            {/* Gráficas de barras - 2 columnas en pantallas grandes */}
+            {/* Gráficas de barras */}
             <div className="grid-two-columns">
                 <GastosPorCategoria gastos={gastos} />
                 <EntrenamientosPorTipo entrenamientos={entrenamientos} />
             </div>
 
-            {/* Evolución temporal - Ancho completo */}
+            {/* Evolución temporal */}
             <EvolucionGastos gastos={gastos} />
         </div>
     );

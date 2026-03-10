@@ -2,108 +2,42 @@ import { format, subMonths, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 function SelectorMes({ mesSeleccionado, onCambiarMes }) {
-  const handleMesAnterior = () => {
-    const nuevoMes = subMonths(mesSeleccionado, 1);
-    onCambiarMes(nuevoMes);
-  };
+  const handleMesAnterior = () => onCambiarMes(subMonths(mesSeleccionado, 1));
 
   const handleMesSiguiente = () => {
     const nuevoMes = addMonths(mesSeleccionado, 1);
-    const hoy = new Date();
-    
-    // No permitir seleccionar meses futuros
-    if (nuevoMes <= hoy) {
-      onCambiarMes(nuevoMes);
-    }
-  };
-
-  const handleHoy = () => {
-    onCambiarMes(new Date());
+    if (nuevoMes <= new Date()) onCambiarMes(nuevoMes);
   };
 
   const esHoy = format(mesSeleccionado, 'yyyy-MM') === format(new Date(), 'yyyy-MM');
   const esFuturo = mesSeleccionado > new Date();
+  const deshabilitarSiguiente = esFuturo || esHoy;
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '15px',
-      marginBottom: '20px',
-      padding: '15px',
-      background: 'white',
-      borderRadius: '10px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-    }}>
-      <button
-        onClick={handleMesAnterior}
-        style={{
-          padding: '10px 20px',
-          background: '#667eea',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontSize: '16px',
-          transition: 'all 0.3s'
-        }}
-        onMouseOver={(e) => e.target.style.background = '#5568d3'}
-        onMouseOut={(e) => e.target.style.background = '#667eea'}
-      >
+    <div className="selector-mes">
+      <button className="btn-primary selector-mes-btn" onClick={handleMesAnterior}>
         ◀ Anterior
       </button>
 
-      <div style={{
-        minWidth: '200px',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          fontSize: '1.3rem',
-          fontWeight: 'bold',
-          color: '#333',
-          textTransform: 'capitalize'
-        }}>
+      <div className="selector-mes-centro">
+        <div className="selector-mes-label">
           {format(mesSeleccionado, 'MMMM yyyy', { locale: es })}
         </div>
         {!esHoy && (
-          <button
-            onClick={handleHoy}
-            style={{
-              marginTop: '5px',
-              padding: '5px 15px',
-              background: '#f0f0f0',
-              color: '#667eea',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
+          <button className="selector-mes-hoy" onClick={() => onCambiarMes(new Date())}>
             Volver a hoy
           </button>
         )}
       </div>
 
       <button
+        className="selector-mes-btn"
         onClick={handleMesSiguiente}
-        disabled={esFuturo || esHoy}
+        disabled={deshabilitarSiguiente}
         style={{
-          padding: '10px 20px',
-          background: (esFuturo || esHoy) ? '#ccc' : '#667eea',
-          color: 'white',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: (esFuturo || esHoy) ? 'not-allowed' : 'pointer',
-          fontSize: '16px',
-          transition: 'all 0.3s',
-          opacity: (esFuturo || esHoy) ? 0.5 : 1
-        }}
-        onMouseOver={(e) => {
-          if (!esFuturo && !esHoy) e.target.style.background = '#5568d3';
-        }}
-        onMouseOut={(e) => {
-          if (!esFuturo && !esHoy) e.target.style.background = '#667eea';
+          background: deshabilitarSiguiente ? 'var(--border)' : 'var(--mint)',
+          color: deshabilitarSiguiente ? 'var(--text-muted)' : '#fff',
+          cursor: deshabilitarSiguiente ? 'not-allowed' : 'pointer',
         }}
       >
         Siguiente ▶
