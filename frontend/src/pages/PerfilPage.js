@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext';
 
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
 const COLORES_FONDO = [
     { label: 'Crema (defecto)', value: '#F7F6F3' },
-    { label: 'Blanco', value: '#FFFFFF' },
-    { label: 'Menta suave', value: '#EAF7EE' },
-    { label: 'Lavanda suave', value: '#F0EBFF' },
+    { label: 'Blanco',          value: '#FFFFFF' },
+    { label: 'Menta suave',     value: '#EAF7EE' },
+    { label: 'Lavanda suave',   value: '#F0EBFF' },
     { label: 'Melocotón suave', value: '#FEF0EA' },
-    { label: 'Azul suave', value: '#EAF2FB' },
-    { label: 'Gris oscuro', value: '#1E1E2E' },
+    { label: 'Azul suave',      value: '#EAF2FB' },
+    { label: 'Gris oscuro',     value: '#1E1E2E' },
 ];
 
 function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
@@ -20,10 +20,13 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
     const [fotoUrl, setFotoUrl] = useState('');
     const [mostrarConfig, setMostrarConfig] = useState(false);
     const [nombreEdit, setNombreEdit] = useState('');
-    const [fotoEdit, setFotoEdit] = useState('');
     const [fondoEdit, setFondoEdit] = useState(localStorage.getItem('dashboard_fondo') || '#F7F6F3');
     const [guardando, setGuardando] = useState(false);
     const [guardadoOk, setGuardadoOk] = useState(false);
+    const [subiendoFoto, setSubiendoFoto] = useState(false);
+    const [fotoPreview, setFotoPreview] = useState('');
+    const [fotoFile, setFotoFile] = useState(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         if (user) {
@@ -49,33 +52,78 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
                         setNombre(data.perfil.nombre || '');
                         setFotoUrl(data.perfil.foto_url || '');
                         setNombreEdit(data.perfil.nombre || '');
-                        setFotoEdit(data.perfil.foto_url || '');
                     }
                 })
                 .catch(console.error);
         }
     }, [email]);
 
+    // Al seleccionar archivo — mostrar preview
+    const handleFotoSeleccionada = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setFotoFile(file);
+        setFotoPreview(URL.createObjectURL(file));
+    };
+
     const guardarPerfil = async () => {
         setGuardando(true);
         try {
+            let nuevaFotoUrl = fotoUrl;
+
+            // Si hay un archivo nuevo, subirlo via Lambda (base64)
+            if (fotoFile) {
+                setSubiendoFoto(true);
+                const extension = fotoFile.name.split('.').pop().toLowerCase();
+
+                // 1. Convertir archivo a base64
+                const imagen_b64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(fotoFile);
+                });
+
+                // 2. Enviar a Lambda que sube a S3
+                const res = await fetch(`${API_URL}/foto`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario_id: email, extension, imagen_b64 })
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                nuevaFotoUrl = data.foto_url;
+                setSubiendoFoto(false);
+            }
+
+            // 3. Guardar nombre y foto_url en DynamoDB
             await fetch(`${API_URL}/perfil`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ usuario_id: email, nombre: nombreEdit, foto_url: fotoEdit })
+                body: JSON.stringify({
+                    usuario_id: email,
+                    nombre: nombreEdit,
+                    foto_url: nuevaFotoUrl
+                })
             });
 
+            // 4. Guardar fondo
             localStorage.setItem('dashboard_fondo', fondoEdit);
             onFondoChange(fondoEdit);
 
             setNombre(nombreEdit);
-            setFotoUrl(fotoEdit);
+            setFotoUrl(nuevaFotoUrl);
+            setFotoFile(null);
+            setFotoPreview('');
             setGuardadoOk(true);
             setTimeout(() => { setGuardadoOk(false); setMostrarConfig(false); }, 1500);
+
         } catch (e) {
             console.error(e);
         } finally {
             setGuardando(false);
+            setSubiendoFoto(false);
         }
     };
 
@@ -154,6 +202,7 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
                     <div className="modal-box">
                         <h2 className="modal-titulo">⚙️ Configurar perfil</h2>
 
+                        {/* Nombre */}
                         <div className="form-group">
                             <label>Nombre / apodo</label>
                             <input
@@ -164,20 +213,53 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
                             />
                         </div>
 
+                        {/* Foto de perfil */}
                         <div className="form-group">
-                            <label>URL de foto de perfil</label>
-                            <input
-                                type="text"
-                                value={fotoEdit}
-                                onChange={e => setFotoEdit(e.target.value)}
-                                placeholder="https://..."
-                            />
-                            {fotoEdit && (
-                                <img src={fotoEdit} alt="preview" className="perfil-foto-preview"
-                                    onError={e => e.target.style.display = 'none'} />
-                            )}
+                            <label>Foto de perfil</label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                                {/* Preview */}
+                                {(fotoPreview || fotoUrl) && (
+                                    <img
+                                        src={fotoPreview || fotoUrl}
+                                        alt="preview"
+                                        className="perfil-avatar-img"
+                                        style={{ width: '60px', height: '60px' }}
+                                        onError={e => e.target.style.display = 'none'}
+                                    />
+                                )}
+                                <div>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        onChange={handleFotoSeleccionada}
+                                        style={{ display: 'none' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current.click()}
+                                        style={{
+                                            background: 'var(--mint-light)',
+                                            color: 'var(--mint)',
+                                            border: '1.5px solid var(--mint)',
+                                            borderRadius: '8px',
+                                            padding: '8px 16px',
+                                            fontSize: '13px',
+                                            fontWeight: '600',
+                                            fontFamily: 'inherit',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        📁 {fotoFile ? fotoFile.name : 'Seleccionar foto'}
+                                    </button>
+                                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                        JPG, PNG o WEBP
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
+                        {/* Color de fondo */}
                         <div className="form-group">
                             <label>Color de fondo del dashboard</label>
                             <div className="perfil-colores">
@@ -193,17 +275,21 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
                             </div>
                         </div>
 
+                        {/* Botones */}
                         <div className="modal-botones">
-                            <button className="modal-btn-cancelar" onClick={() => setMostrarConfig(false)}>
+                            <button className="modal-btn-cancelar" onClick={() => { setMostrarConfig(false); setFotoFile(null); setFotoPreview(''); }}>
                                 Cancelar
                             </button>
                             <button
                                 className="modal-btn-guardar"
                                 onClick={guardarPerfil}
                                 disabled={guardando}
-                                style={{ background: guardadoOk ? '#D8F3DC' : '#2D6A4F', color: guardadoOk ? '#2D6A4F' : '#fff' }}
+                                style={{
+                                    background: guardadoOk ? '#D8F3DC' : '#2D6A4F',
+                                    color: guardadoOk ? '#2D6A4F' : '#fff',
+                                }}
                             >
-                                {guardadoOk ? '✓ Guardado' : guardando ? 'Guardando...' : 'Guardar'}
+                                {subiendoFoto ? '📤 Subiendo foto...' : guardadoOk ? '✓ Guardado' : guardando ? 'Guardando...' : 'Guardar'}
                             </button>
                         </div>
                     </div>

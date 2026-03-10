@@ -2,51 +2,82 @@
 
 ## Calendario
 
-**Inicio:** Febrero 2025  
-**Entrega:** Junio 2025  
-**Duración:** 16 semanas  
+**Inicio:** Febrero 2026  
+**Entrega:** 18 de mayo de 2026  
+**Duración:** ~14 semanas  
 
 ## Fases del proyecto
 
-### Parte 1: Preparación ✅
+### Fase 1: Preparación ✅
 - [x] Cuenta AWS
-- [x] Herramientas instaladas
-- [x] Tutoriales básicos
+- [x] Herramientas instaladas (Node.js, Python, AWS CLI)
 - [x] Repositorio GitHub
+- [x] CI/CD con GitHub Actions
 
-### Parte 2-3: Infraestructura AWS
-- [x] Crear tabla DynamoDB
-- [x] Funciones Lambda básicas
-- [x] API Gateway
+### Fase 2: Infraestructura AWS ✅
+- [x] Tablas DynamoDB (`gastos`, `deporte`, `perfiles`)
+- [x] Funciones Lambda en Python
+- [x] API Gateway REST con CORS
+- [x] S3 + CloudFront para frontend
+- [x] S3 bucket para fotos de perfil
 
-### Parte 4-5: Frontend básico
-- [ ] Formulario añadir gastos
-- [ ] Lista de gastos
-- [ ] Conexión con API
+### Fase 3: Frontend — Módulo Gastos ✅
+- [x] Formulario añadir gastos
+- [x] Lista de gastos con categorías
+- [x] Eliminar gastos
+- [x] Exportar a CSV
+- [x] Gráficas por categoría
 
-### Parte 6-7: Gráficas
-- [ ] Visualización por categorías
-- [ ] Comparativas mensuales
+### Fase 4: Frontend — Módulo Deporte ✅
+- [x] Formulario añadir entrenamientos
+- [x] Lista de entrenamientos
+- [x] Eliminar entrenamientos
+- [x] Exportar a CSV
+- [x] Gráficas de progreso
 
-### Parte 8: Despliegue
-- [ ] S3 + CloudFront
-- [ ] HTTPS
+### Fase 5: Dashboard y comparativas ✅
+- [x] Resumen general
+- [x] Comparativa mensual gastos vs deporte
+- [x] Selector de mes
 
-### Parte 9-10: Módulo Deporte
-- [ ] CRUD entrenamientos
-- [ ] Gráficas de progreso
+### Fase 6: Autenticación ✅
+- [x] Amazon Cognito User Pool
+- [x] Login con email y contraseña
+- [x] Rutas privadas protegidas
+- [x] Sesión persistente
 
-### Parte 11: Seguridad
-- [ ] Autenticación
-- [ ] CORS
-- [ ] IAM
+### Fase 7: Perfil de usuario ✅
+- [x] Página de perfil
+- [x] Nombre/apodo guardado en DynamoDB
+- [x] Foto de perfil subida a S3
+- [x] Color de fondo personalizable
+- [x] Tema oscuro
+- [x] Estadísticas de uso
 
-### Parte 12: CI/CD
-- [ ] GitHub Actions
+### Fase 8: UX y diseño ✅
+- [x] Paleta de colores pastel
+- [x] Tipografía DM Sans
+- [x] Sidebar responsive con menú hamburguesa
+- [x] Diseño móvil adaptado
 
-### Parte 13-15: Documentación
+### Fase 9: Seguridad y ajustes finales
+- [x] HTTPS en todo el sistema
+- [x] CORS configurado
+- [x] IAM roles con permisos mínimos
+- [ ] Expiración de sesión por inactividad (5 min)
+
+### Fase 10: Documentación y defensa
 - [ ] Memoria del TFG
-
-### Parte 16: Preparación defensa
 - [ ] Presentación
-- [ ] Ensayo
+- [ ] Ensayo defensa
+
+## 📅 Fechas clave
+
+| Hito | Fecha |
+|---|---|
+| Inicio del proyecto | Febrero 2026 |
+| Backend funcional | Febrero 2026 |
+| Frontend completo | Marzo 2026 |
+| Autenticación y perfil | Marzo 2026 |
+| Documentación | Abril - Mayo 2026 |
+| **Entrega TFG** | **18 de mayo de 2026** |
