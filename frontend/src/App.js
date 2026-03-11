@@ -62,17 +62,6 @@ function AppContent() {
     }
   }, [user]);
 
-  // Cargar datos cuando tengamos el email
-  useEffect(() => {
-    if (email) {
-      cargarTodosDatos(email);
-    }
-  }, [email, cargarTodosDatos]);
-
-  const cargarTodosDatos = useCallback(async (uid) => {
-    await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
-  }, []);
-
   const cargarGastos = async (uid) => {
     try {
       setLoading(true);
@@ -99,6 +88,17 @@ function AppContent() {
       mostrarToast('Error al cargar entrenamientos', 'error');
     }
   };
+
+  const cargarTodosDatos = useCallback(async (uid) => {
+    await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
+  }, []);
+  
+  // Cargar datos cuando tengamos el email
+  useEffect(() => {
+    if (email) {
+      cargarTodosDatos(email);
+    }
+  }, [email, cargarTodosDatos]);
 
   const handleGastoCreado = async (nuevoGasto) => {
     try {
