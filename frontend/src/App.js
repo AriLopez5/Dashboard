@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
