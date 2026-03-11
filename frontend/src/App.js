@@ -89,9 +89,9 @@ function AppContent() {
     }
   };
 
-  const cargarTodosDatos = async (uid) => {
+  const cargarTodosDatos = useCallback(async (uid) => {
     await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
-  };
+  }, []);
   
   // Cargar datos cuando tengamos el email
   useEffect(() => {
