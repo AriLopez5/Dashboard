@@ -1,12 +1,11 @@
 import json
 import boto3
 from decimal import Decimal
+from boto3.dynamodb.conditions import Attr
 
-# Cliente de DynamoDB
 dynamodb = boto3.resource('dynamodb', region_name='eu-north-1')
 table = dynamodb.Table('gastos')
 
-# Función helper para convertir Decimal a float en JSON
 class DecimalEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Decimal):
@@ -15,31 +14,24 @@ class DecimalEncoder(json.JSONEncoder):
 
 def lambda_handler(event, context):
     try:
-        # Obtener parámetros opcionales de query string
         query_params = event.get('queryStringParameters', {}) or {}
-        
-        # Categoría para filtrar (opcional)
+        usuario_id = query_params.get('usuario_id', 'default_user')
         categoria = query_params.get('categoria')
-        
-        # Escanear la tabla (obtener todos los items)
+
+        # Filtrar siempre por usuario_id
         if categoria:
-            # Filtrar por categoría
             response = table.scan(
-                FilterExpression='categoria = :cat',
-                ExpressionAttributeValues={':cat': categoria}
+                FilterExpression=Attr('usuario_id').eq(usuario_id) & Attr('categoria').eq(categoria)
             )
         else:
-            # Obtener todos los gastos
-            response = table.scan()
-        
+            response = table.scan(
+                FilterExpression=Attr('usuario_id').eq(usuario_id)
+            )
+
         gastos = response.get('Items', [])
-        
-        # Ordenar por fecha (más recientes primero)
         gastos_ordenados = sorted(gastos, key=lambda x: x.get('fecha', ''), reverse=True)
-        
-        # Calcular total
-        total = sum(float(gasto.get('cantidad', 0)) for gasto in gastos)
-        
+        total = sum(float(g.get('cantidad', 0)) for g in gastos)
+
         return {
             'statusCode': 200,
             'headers': {
@@ -52,7 +44,7 @@ def lambda_handler(event, context):
                 'gastos': gastos_ordenados
             }, cls=DecimalEncoder)
         }
-        
+
     except Exception as e:
         print(f"Error: {str(e)}")
         return {
@@ -61,8 +53,5 @@ def lambda_handler(event, context):
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({
-                'error': 'Error interno del servidor',
-                'details': str(e)
-            })
+            'body': json.dumps({'error': 'Error interno del servidor', 'details': str(e)})
         }

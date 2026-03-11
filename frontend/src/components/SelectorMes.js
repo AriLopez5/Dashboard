@@ -9,38 +9,66 @@ function SelectorMes({ mesSeleccionado, onCambiarMes }) {
     if (nuevoMes <= new Date()) onCambiarMes(nuevoMes);
   };
 
+  const handleHoy = () => onCambiarMes(new Date());
+
   const esHoy = format(mesSeleccionado, 'yyyy-MM') === format(new Date(), 'yyyy-MM');
   const esFuturo = mesSeleccionado > new Date();
-  const deshabilitarSiguiente = esFuturo || esHoy;
+  const disabled = esFuturo || esHoy;
+
+  const btnBase = {
+    display: 'inline-flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 20px',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontFamily: 'inherit',
+    whiteSpace: 'nowrap',
+    transition: 'all 0.3s',
+    cursor: 'pointer',
+  };
 
   return (
-    <div className="selector-mes">
-      <button className="btn-primary selector-mes-btn" onClick={handleMesAnterior}>
-        ◀ Anterior
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '15px',
+      marginBottom: '20px',
+      padding: '15px',
+      background: 'white',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      flexWrap: 'nowrap',
+    }}>
+      <style>{`
+        @media (max-width: 480px) {
+          .selector-btn-texto { display: none; }
+        }
+      `}</style>
+
+      {/* Botón anterior */}
+      <button
+        onClick={handleMesAnterior}
+        style={{ ...btnBase, background: '#667eea' }}
+        onMouseOver={e => e.currentTarget.style.background = '#5568d3'}
+        onMouseOut={e => e.currentTarget.style.background = '#667eea'}
+      >
+        ◀ <span className="selector-btn-texto">Anterior</span>
       </button>
 
-      <div className="selector-mes-centro">
-        <div className="selector-mes-label">
-          {format(mesSeleccionado, 'MMMM yyyy', { locale: es })}
-        </div>
-        {!esHoy && (
-          <button className="selector-mes-hoy" onClick={() => onCambiarMes(new Date())}>
-            Volver a hoy
-          </button>
-        )}
-      </div>
-
+      {/* Botón siguiente */}
       <button
-        className="selector-mes-btn"
         onClick={handleMesSiguiente}
-        disabled={deshabilitarSiguiente}
-        style={{
-          background: deshabilitarSiguiente ? 'var(--border)' : 'var(--mint)',
-          color: deshabilitarSiguiente ? 'var(--text-muted)' : '#fff',
-          cursor: deshabilitarSiguiente ? 'not-allowed' : 'pointer',
-        }}
+        disabled={disabled}
+        style={{ ...btnBase, background: disabled ? '#ccc' : '#667eea', opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
+        onMouseOver={e => { if (!disabled) e.currentTarget.style.background = '#5568d3'; }}
+        onMouseOut={e => { if (!disabled) e.currentTarget.style.background = '#667eea'; }}
       >
-        Siguiente ▶
+        <span className="selector-btn-texto">Siguiente</span> ▶
       </button>
     </div>
   );

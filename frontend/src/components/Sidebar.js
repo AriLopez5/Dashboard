@@ -70,6 +70,15 @@ function Sidebar() {
             <span className="nav-icon">👤</span>
             <span className="nav-text">Perfil</span>
           </NavLink>
+
+          <NavLink
+            to="/comunidad"
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+            onClick={handleNavClick}
+          >
+            <span className="nav-icon">🌍</span>
+            <span className="nav-text">Comunidad</span>
+          </NavLink>
         </nav>
 
         <div className="sidebar-footer">
