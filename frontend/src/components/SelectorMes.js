@@ -1,5 +1,4 @@
 import { format, subMonths, addMonths } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 function SelectorMes({ mesSeleccionado, onCambiarMes }) {
   const handleMesAnterior = () => onCambiarMes(subMonths(mesSeleccionado, 1));
@@ -8,8 +7,6 @@ function SelectorMes({ mesSeleccionado, onCambiarMes }) {
     const nuevoMes = addMonths(mesSeleccionado, 1);
     if (nuevoMes <= new Date()) onCambiarMes(nuevoMes);
   };
-
-  const handleHoy = () => onCambiarMes(new Date());
 
   const esHoy = format(mesSeleccionado, 'yyyy-MM') === format(new Date(), 'yyyy-MM');
   const esFuturo = mesSeleccionado > new Date();

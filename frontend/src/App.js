@@ -12,6 +12,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import LandingPage from './pages/LandingPage';
+import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
@@ -67,11 +68,11 @@ function AppContent() {
     if (email) {
       cargarTodosDatos(email);
     }
-  }, [email]);
+  }, [email, cargarTodosDatos]);
 
-  const cargarTodosDatos = async (uid) => {
+  const cargarTodosDatos = useCallback(async (uid) => {
     await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
-  };
+  }, []);
 
   const cargarGastos = async (uid) => {
     try {
@@ -188,30 +189,30 @@ function AppContent() {
     setToast({ visible: true, mensaje, tipo });
   };
 
-return (
-  <Routes>
-    <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
-    <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
-    <Route path="/*" element={
-      <PrivateRoute>
-        <div className="app-container">
-          <Sidebar />
-          <main className="main-content">
-            <Routes>
-              <Route path="dashboard" element={<Dashboard gastos={gastos} entrenamientos={entrenamientos} loading={loading} />} />
-              <Route path="gastos" element={<GastosPage gastos={gastos} loading={loading} onGastoCreado={handleGastoCreado} onEliminarGasto={handleEliminarGasto} onActualizarGasto={handleActualizarGasto} />} />
-              <Route path="deporte" element={<DeportePage entrenamientos={entrenamientos} loading={loading} onEntrenamientoCreado={handleEntrenamientoCreado} onEliminarEntrenamiento={handleEliminarEntrenamiento} onActualizarEntrenamiento={handleActualizarEntrenamiento} />} />
-              <Route path="perfil" element={<PerfilPage gastos={gastos} entrenamientos={entrenamientos} onFondoChange={setFondo} />} />
-              <Route path="comunidad" element={<ComunidadPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </main>
-          <Toast mensaje={toast.mensaje} tipo={toast.tipo} visible={toast.visible} onClose={() => setToast({ ...toast, visible: false })} />
-        </div>
-      </PrivateRoute>
-    } />
-  </Routes>
-);
+  return (
+    <Routes>
+      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+      <Route path="/*" element={
+        <PrivateRoute>
+          <div className="app-container">
+            <Sidebar />
+            <main className="main-content">
+              <Routes>
+                <Route path="dashboard" element={<Dashboard gastos={gastos} entrenamientos={entrenamientos} loading={loading} />} />
+                <Route path="gastos" element={<GastosPage gastos={gastos} loading={loading} onGastoCreado={handleGastoCreado} onEliminarGasto={handleEliminarGasto} onActualizarGasto={handleActualizarGasto} />} />
+                <Route path="deporte" element={<DeportePage entrenamientos={entrenamientos} loading={loading} onEntrenamientoCreado={handleEntrenamientoCreado} onEliminarEntrenamiento={handleEliminarEntrenamiento} onActualizarEntrenamiento={handleActualizarEntrenamiento} />} />
+                <Route path="perfil" element={<PerfilPage gastos={gastos} entrenamientos={entrenamientos} onFondoChange={setFondo} />} />
+                <Route path="comunidad" element={<ComunidadPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </main>
+            <Toast mensaje={toast.mensaje} tipo={toast.tipo} visible={toast.visible} onClose={() => setToast({ ...toast, visible: false })} />
+          </div>
+        </PrivateRoute>
+      } />
+    </Routes>
+  );
 }
 
 function App() {
