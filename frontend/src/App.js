@@ -7,32 +7,24 @@ import GastosPage from './pages/GastosPage';
 import DeportePage from './pages/DeportePage';
 import PerfilPage from './pages/PerfilPage';
 import ComunidadPage from './pages/ComunidadPage';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
-import LandingPage from './pages/LandingPage';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
-function getEmail(user) {
-  return new Promise((resolve) => {
-    if (!user) return resolve(null);
-    user.getUserAttributes((err, attrs) => {
-      if (err || !attrs) return resolve(null);
-      const emailAttr = attrs.find(a => a.Name === 'email');
-      resolve(emailAttr ? emailAttr.Value : null);
-    });
-  });
-}
-
+// ── Componente que protege las rutas privadas ─────────────────────────────────
 function PrivateRoute({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="loading">Cargando...</div>;
-  return user ? children : <Navigate to="/login" />;
+  const { user, loading: loadingAuth } = useAuth();
+  if (loadingAuth) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
 }
 
-function AppContent() {
+// ── Lógica principal de la app (dentro del AuthProvider) ──────────────────────
+function AppInner() {
   const { user } = useAuth();
   const [email, setEmail] = useState(null);
   const [gastos, setGastos] = useState([]);
@@ -41,7 +33,20 @@ function AppContent() {
   const [fondo, setFondo] = useState(localStorage.getItem('dashboard_fondo') || '#F7F6F3');
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'success' });
 
-  // Aplicar fondo y tema oscuro
+  useEffect(() => {
+    if (user) {
+      user.getUserAttributes((err, attrs) => {
+        if (!err) {
+          const emailAttr = attrs.find(a => a.Name === 'email');
+          if (emailAttr) setEmail(emailAttr.Value);
+        }
+      });
+    } else {
+      setEmail(null);
+    }
+  }, [user]);
+
+  // Aplicar fondo al document
   useEffect(() => {
     document.documentElement.style.backgroundColor = fondo;
     document.body.style.backgroundColor = fondo;
@@ -50,173 +55,210 @@ function AppContent() {
     else document.body.classList.remove('tema-oscuro');
   }, [fondo]);
 
-  // Obtener email cuando el usuario se autentica
-  useEffect(() => {
-    if (user) {
-      getEmail(user).then(e => setEmail(e));
-    } else {
-      setEmail(null);
-      setGastos([]);
-      setEntrenamientos([]);
+  // ── Carga de datos ────────────────────────────────────────────────────────
+  const cargarGastos = useCallback(async () => {
+    if (!email) return;
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}/gastos?usuario_id=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      setGastos(data.gastos || []);
+    } catch (e) {
+      console.error(e);
+      mostrarToast('Error al cargar los gastos', 'error');
+    } finally {
+      setLoading(false);
     }
-  }, [user]);
+  }, [email]);
+
+  const cargarEntrenamientos = useCallback(async () => {
+    if (!email) return;
+    try {
+      const res = await fetch(`${API_URL}/entrenamientos?usuario_id=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      setEntrenamientos(data.entrenamientos || []);
+    } catch (e) {
+      console.error(e);
+      mostrarToast('Error al cargar entrenamientos', 'error');
+    }
+  }, [email]);
+
+  const cargarTodosDatos = useCallback(async () => {
+    await Promise.all([cargarGastos(), cargarEntrenamientos()]);
+  }, [cargarGastos, cargarEntrenamientos]);
+
+  useEffect(() => {
+    if (email) cargarTodosDatos();
+  }, [email, cargarTodosDatos]);
+
+  // ── Handlers gastos ───────────────────────────────────────────────────────
+  const handleGastoCreado = async (nuevoGasto) => {
+    try {
+      const res = await fetch(`${API_URL}/gastos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...nuevoGasto, usuario_id: email }),
+      });
+      if (!res.ok) throw new Error();
+      await cargarGastos();
+      mostrarToast('✅ Gasto añadido correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al añadir el gasto', 'error');
+    }
+  };
+
+  const handleEliminarGasto = async (gastoId) => {
+    if (!window.confirm('¿Seguro que quieres eliminar este gasto?')) return;
+    try {
+      const res = await fetch(`${API_URL}/gastos/${gastoId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      await cargarGastos();
+      mostrarToast('✅ Gasto eliminado correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al eliminar el gasto', 'error');
+    }
+  };
+
+  const handleActualizarGasto = async (gastoId, datos) => {
+    try {
+      const res = await fetch(`${API_URL}/gastos/${gastoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      await cargarGastos();
+      mostrarToast('✅ Gasto actualizado correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al actualizar el gasto', 'error');
+    }
+  };
+
+  // ── Handlers entrenamientos ───────────────────────────────────────────────
+  const handleEntrenamientoCreado = async (nuevoEntrenamiento) => {
+    try {
+      const res = await fetch(`${API_URL}/entrenamientos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...nuevoEntrenamiento, usuario_id: email }),
+      });
+      if (!res.ok) throw new Error();
+      await cargarEntrenamientos();
+      mostrarToast('✅ Entrenamiento añadido correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al añadir el entrenamiento', 'error');
+    }
+  };
+
+  const handleEliminarEntrenamiento = async (entrenamientoId) => {
+    if (!window.confirm('¿Seguro que quieres eliminar este entrenamiento?')) return;
+    try {
+      const res = await fetch(`${API_URL}/entrenamientos/${entrenamientoId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      await cargarEntrenamientos();
+      mostrarToast('✅ Entrenamiento eliminado correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al eliminar el entrenamiento', 'error');
+    }
+  };
+
+  const handleActualizarEntrenamiento = async (entrenamientoId, datos) => {
+    try {
+      const res = await fetch(`${API_URL}/entrenamientos/${entrenamientoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos),
+      });
+      if (!res.ok) throw new Error();
+      await cargarEntrenamientos();
+      mostrarToast('✅ Entrenamiento actualizado correctamente', 'success');
+    } catch {
+      mostrarToast('❌ Error al actualizar el entrenamiento', 'error');
+    }
+  };
 
   const mostrarToast = (mensaje, tipo = 'success') => {
     setToast({ visible: true, mensaje, tipo });
   };
 
-  const cargarGastos = useCallback(async (uid) => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/gastos?usuario_id=${encodeURIComponent(uid)}`);
-      if (!response.ok) throw new Error('Error al cargar gastos');
-      const data = await response.json();
-      setGastos(data.gastos || []);
-    } catch (error) {
-      console.error('Error:', error);
-      mostrarToast('Error al cargar los gastos', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const cargarEntrenamientos = useCallback(async (uid) => {
-    try {
-      const response = await fetch(`${API_URL}/entrenamientos?usuario_id=${encodeURIComponent(uid)}`);
-      if (!response.ok) throw new Error('Error al cargar entrenamientos');
-      const data = await response.json();
-      setEntrenamientos(data.entrenamientos || []);
-    } catch (error) {
-      console.error('Error:', error);
-      mostrarToast('Error al cargar entrenamientos', 'error');
-    }
-  }, []);
-
-  const cargarTodosDatos = useCallback(async (uid) => {
-    await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
-  }, [cargarGastos, cargarEntrenamientos]);
-
-  // Cargar datos cuando tengamos el email
-  useEffect(() => {
-    if (email) cargarTodosDatos(email);
-  }, [email, cargarTodosDatos]);
-
-  const handleGastoCreado = async (nuevoGasto) => {
-    try {
-      const response = await fetch(`${API_URL}/gastos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...nuevoGasto, usuario_id: email })
-      });
-      if (!response.ok) throw new Error('Error al crear el gasto');
-      await cargarGastos(email);
-      mostrarToast('✅ Gasto añadido correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al añadir el gasto', 'error');
-    }
-  };
-
-  const handleEntrenamientoCreado = async (nuevoEntrenamiento) => {
-    try {
-      const response = await fetch(`${API_URL}/entrenamientos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...nuevoEntrenamiento, usuario_id: email })
-      });
-      if (!response.ok) throw new Error('Error al crear el entrenamiento');
-      await cargarEntrenamientos(email);
-      mostrarToast('✅ Entrenamiento añadido correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al añadir el entrenamiento', 'error');
-    }
-  };
-
-  const handleEliminarGasto = async (gastoId) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este gasto?')) return;
-    try {
-      const response = await fetch(`${API_URL}/gastos/${gastoId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Error al eliminar el gasto');
-      await cargarGastos(email);
-      mostrarToast('✅ Gasto eliminado correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al eliminar el gasto', 'error');
-    }
-  };
-
-  const handleActualizarGasto = async (gastoId, datosActualizados) => {
-    try {
-      const response = await fetch(`${API_URL}/gastos/${gastoId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...datosActualizados, usuario_id: email })
-      });
-      if (!response.ok) throw new Error('Error al actualizar el gasto');
-      await cargarGastos(email);
-      mostrarToast('✅ Gasto actualizado correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al actualizar el gasto', 'error');
-    }
-  };
-
-  const handleEliminarEntrenamiento = async (entrenamientoId) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este entrenamiento?')) return;
-    try {
-      const response = await fetch(`${API_URL}/entrenamientos/${entrenamientoId}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Error al eliminar el entrenamiento');
-      await cargarEntrenamientos(email);
-      mostrarToast('✅ Entrenamiento eliminado correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al eliminar el entrenamiento', 'error');
-    }
-  };
-
-  const handleActualizarEntrenamiento = async (entrenamientoId, datosActualizados) => {
-    try {
-      const response = await fetch(`${API_URL}/entrenamientos/${entrenamientoId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...datosActualizados, usuario_id: email })
-      });
-      if (!response.ok) throw new Error('Error al actualizar el entrenamiento');
-      await cargarEntrenamientos(email);
-      mostrarToast('✅ Entrenamiento actualizado correctamente', 'success');
-    } catch (error) {
-      mostrarToast('❌ Error al actualizar el entrenamiento', 'error');
-    }
+  const handleFondoChange = (nuevoFondo) => {
+    setFondo(nuevoFondo);
+    localStorage.setItem('dashboard_fondo', nuevoFondo);
   };
 
   return (
-    <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
-      <Route path="/*" element={
-        <PrivateRoute>
-          <div className="app-container">
-            <Sidebar />
-            <main className="main-content">
-              <Routes>
-                <Route path="dashboard" element={<Dashboard gastos={gastos} entrenamientos={entrenamientos} loading={loading} />} />
-                <Route path="gastos" element={<GastosPage gastos={gastos} loading={loading} onGastoCreado={handleGastoCreado} onEliminarGasto={handleEliminarGasto} onActualizarGasto={handleActualizarGasto} />} />
-                <Route path="deporte" element={<DeportePage entrenamientos={entrenamientos} loading={loading} onEntrenamientoCreado={handleEntrenamientoCreado} onEliminarEntrenamiento={handleEliminarEntrenamiento} onActualizarEntrenamiento={handleActualizarEntrenamiento} />} />
-                <Route path="perfil" element={<PerfilPage gastos={gastos} entrenamientos={entrenamientos} onFondoChange={setFondo} />} />
-                <Route path="comunidad" element={<ComunidadPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </main>
-            <Toast mensaje={toast.mensaje} tipo={toast.tipo} visible={toast.visible} onClose={() => setToast({ ...toast, visible: false })} />
-          </div>
-        </PrivateRoute>
-      } />
-    </Routes>
+    <Router>
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+
+        {/* Rutas privadas */}
+        <Route path="/*" element={
+          <PrivateRoute>
+            <div className="app-container">
+              <Sidebar />
+              <main className="main-content">
+                <Routes>
+                  <Route path="dashboard" element={
+                    <Dashboard
+                      gastos={gastos}
+                      entrenamientos={entrenamientos}
+                      loading={loading}
+                      email={email}
+                    />
+                  } />
+                  <Route path="gastos" element={
+                    <GastosPage
+                      gastos={gastos}
+                      loading={loading}
+                      email={email}
+                      onGastoCreado={handleGastoCreado}
+                      onEliminarGasto={handleEliminarGasto}
+                      onActualizarGasto={handleActualizarGasto}
+                    />
+                  } />
+                  <Route path="deporte" element={
+                    <DeportePage
+                      entrenamientos={entrenamientos}
+                      loading={loading}
+                      email={email}
+                      onEntrenamientoCreado={handleEntrenamientoCreado}
+                      onEliminarEntrenamiento={handleEliminarEntrenamiento}
+                      onActualizarEntrenamiento={handleActualizarEntrenamiento}
+                    />
+                  } />
+                  <Route path="perfil" element={
+                    <PerfilPage
+                      gastos={gastos}
+                      entrenamientos={entrenamientos}
+                      onFondoChange={handleFondoChange}
+                    />
+                  } />
+                  <Route path="comunidad" element={<ComunidadPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </main>
+            </div>
+          </PrivateRoute>
+        } />
+      </Routes>
+
+      <Toast
+        mensaje={toast.mensaje}
+        tipo={toast.tipo}
+        visible={toast.visible}
+        onClose={() => setToast(t => ({ ...t, visible: false }))}
+      />
+    </Router>
   );
 }
 
+// ── Raíz con AuthProvider ─────────────────────────────────────────────────────
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <AppInner />
     </AuthProvider>
   );
 }
