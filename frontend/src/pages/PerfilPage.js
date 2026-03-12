@@ -481,7 +481,7 @@ function PerfilPage({ gastos, entrenamientos, onFondoChange }) {
                                         📁 {fotoFile ? fotoFile.name : 'Seleccionar foto'}
                                     </button>
                                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                                        JPG, PNG o WEBP
+                                        JPG, PNG o WEBP · Máximo 6 MB · Recomendado: imagen cuadrada (ej. 400×400 px)
                                     </div>
                                 </div>
                             </div>

@@ -15,49 +15,93 @@ class DecimalEncoder(json.JSONEncoder):
         return super(DecimalEncoder, self).default(obj)
 
 def lambda_handler(event, context):
+    print("=== INICIO ===")
     try:
-        # Obtener todos los gastos
         gastos = tabla_gastos.scan().get('Items', [])
-
-        # Obtener todos los entrenamientos
+        print(f"Gastos: {len(gastos)}")
         entrenamientos = tabla_deporte.scan().get('Items', [])
-
-        # Obtener todos los perfiles (para nombres)
+        print(f"Entrenamientos: {len(entrenamientos)}")
         perfiles_raw = tabla_perfiles.scan().get('Items', [])
-        perfiles = { p['usuario_id']: p.get('nombre', p['usuario_id'].split('@')[0]) for p in perfiles_raw }
+        perfiles = {
+            p['usuario_id']: {
+                'nombre': p.get('nombre', p['usuario_id'].split('@')[0]),
+                'foto_url': p.get('foto_url', '')
+            }
+            for p in perfiles_raw
+        }
 
-        # Agrupar gastos por usuario
+        # Totales por usuario
         gastos_por_usuario = defaultdict(lambda: {'total': 0, 'cantidad': 0})
         for g in gastos:
             uid = g.get('usuario_id', 'desconocido')
             gastos_por_usuario[uid]['total'] += float(g.get('cantidad', 0))
             gastos_por_usuario[uid]['cantidad'] += 1
 
-        # Agrupar entrenamientos por usuario
         deporte_por_usuario = defaultdict(lambda: {'minutos': 0, 'sesiones': 0})
         for e in entrenamientos:
             uid = e.get('usuario_id', 'desconocido')
             deporte_por_usuario[uid]['minutos'] += float(e.get('duracion', 0))
             deporte_por_usuario[uid]['sesiones'] += 1
 
-        # Unir todos los usuarios conocidos
-        todos_usuarios = set(list(gastos_por_usuario.keys()) + list(deporte_por_usuario.keys()))
+        # Rankings por mes
+        gastos_por_mes = defaultdict(lambda: defaultdict(float))
+        for g in gastos:
+            uid = g.get('usuario_id', 'desconocido')
+            fecha = g.get('fecha', '')
+            mes = fecha[:7] if fecha else ''
+            print(f"Gasto fecha: {fecha} -> mes: {mes}")
+            if mes:
+                gastos_por_mes[mes][uid] += float(g.get('cantidad', 0))
 
+        deporte_por_mes = defaultdict(lambda: defaultdict(float))
+        for e in entrenamientos:
+            uid = e.get('usuario_id', 'desconocido')
+            fecha = e.get('fecha', '')
+            mes = fecha[:7] if fecha else ''
+            print(f"Deporte fecha: {fecha} -> mes: {mes}")
+            if mes:
+                deporte_por_mes[mes][uid] += float(e.get('duracion', 0))
+
+        print(f"gastos_por_mes keys: {list(gastos_por_mes.keys())}")
+        print(f"deporte_por_mes keys: {list(deporte_por_mes.keys())}")
+
+        todos_meses = set(list(gastos_por_mes.keys()) + list(deporte_por_mes.keys()))
+
+        def fila(uid, valor):
+            p = perfiles.get(uid, {})
+            return {
+                'usuario_id': uid,
+                'nombre': p.get('nombre', uid.split('@')[0]),
+                'foto_url': p.get('foto_url', ''),
+                'valor': round(float(valor), 2)
+            }
+
+        rankings_por_mes = {}
+        for mes in todos_meses:
+            rankings_por_mes[mes] = {
+                'gastos': sorted(
+                    [fila(uid, val) for uid, val in gastos_por_mes[mes].items()],
+                    key=lambda x: x['valor'], reverse=True
+                )[:5],
+                'deporte': sorted(
+                    [fila(uid, val) for uid, val in deporte_por_mes[mes].items()],
+                    key=lambda x: x['valor'], reverse=True
+                )[:5],
+            }
+
+        todos_usuarios = set(list(gastos_por_usuario.keys()) + list(deporte_por_usuario.keys()))
         usuarios_resumen = []
         for uid in todos_usuarios:
-            nombre = perfiles.get(uid, uid.split('@')[0] if '@' in uid else uid)
+            p = perfiles.get(uid, {})
             usuarios_resumen.append({
                 'usuario_id': uid,
-                'nombre': nombre,
+                'nombre': p.get('nombre', uid.split('@')[0]),
+                'foto_url': p.get('foto_url', ''),
                 'gastos_total': round(gastos_por_usuario[uid]['total'], 2),
                 'gastos_cantidad': gastos_por_usuario[uid]['cantidad'],
                 'deporte_minutos': round(deporte_por_usuario[uid]['minutos'], 0),
                 'deporte_sesiones': deporte_por_usuario[uid]['sesiones'],
             })
-
-        # Totales globales
-        total_global_gastos = round(sum(float(g.get('cantidad', 0)) for g in gastos), 2)
-        total_global_minutos = round(sum(float(e.get('duracion', 0)) for e in entrenamientos), 0)
 
         return {
             'statusCode': 200,
@@ -69,21 +113,24 @@ def lambda_handler(event, context):
                 'usuarios': usuarios_resumen,
                 'totales': {
                     'num_usuarios': len(todos_usuarios),
-                    'gastos_total': total_global_gastos,
+                    'gastos_total': round(sum(float(g.get('cantidad', 0)) for g in gastos), 2),
                     'gastos_registros': len(gastos),
-                    'deporte_minutos': total_global_minutos,
+                    'deporte_minutos': round(sum(float(e.get('duracion', 0)) for e in entrenamientos), 0),
                     'deporte_sesiones': len(entrenamientos),
-                }
+                },
+                'rankings_por_mes': rankings_por_mes
             }, cls=DecimalEncoder)
         }
 
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print(f"ERROR: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
         return {
             'statusCode': 500,
             'headers': {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': 'Error interno del servidor', 'details': str(e)})
+            'body': json.dumps({'error': str(e)})
         }
