@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -8,14 +9,12 @@ import PerfilPage from './pages/PerfilPage';
 import ComunidadPage from './pages/ComunidadPage';
 import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
+import LandingPage from './pages/LandingPage';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './auth/AuthContext';
-import LandingPage from './pages/LandingPage';
-import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
-// Obtener email del usuario Cognito
 function getEmail(user) {
   return new Promise((resolve) => {
     if (!user) return resolve(null);
@@ -62,18 +61,11 @@ function AppContent() {
     }
   }, [user]);
 
-  // Cargar datos cuando tengamos el email
-  useEffect(() => {
-    if (email) {
-      cargarTodosDatos(email);
-    }
-  }, [email, cargarTodosDatos]);
+  const mostrarToast = (mensaje, tipo = 'success') => {
+    setToast({ visible: true, mensaje, tipo });
+  };
 
-  const cargarTodosDatos = useCallback(async (uid) => {
-    await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
-  }, []);
-
-  const cargarGastos = async (uid) => {
+  const cargarGastos = useCallback(async (uid) => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/gastos?usuario_id=${encodeURIComponent(uid)}`);
@@ -86,9 +78,9 @@ function AppContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const cargarEntrenamientos = async (uid) => {
+  const cargarEntrenamientos = useCallback(async (uid) => {
     try {
       const response = await fetch(`${API_URL}/entrenamientos?usuario_id=${encodeURIComponent(uid)}`);
       if (!response.ok) throw new Error('Error al cargar entrenamientos');
@@ -98,7 +90,16 @@ function AppContent() {
       console.error('Error:', error);
       mostrarToast('Error al cargar entrenamientos', 'error');
     }
-  };
+  }, []);
+
+  const cargarTodosDatos = useCallback(async (uid) => {
+    await Promise.all([cargarGastos(uid), cargarEntrenamientos(uid)]);
+  }, [cargarGastos, cargarEntrenamientos]);
+
+  // Cargar datos cuando tengamos el email
+  useEffect(() => {
+    if (email) cargarTodosDatos(email);
+  }, [email, cargarTodosDatos]);
 
   const handleGastoCreado = async (nuevoGasto) => {
     try {
@@ -182,10 +183,6 @@ function AppContent() {
     } catch (error) {
       mostrarToast('❌ Error al actualizar el entrenamiento', 'error');
     }
-  };
-
-  const mostrarToast = (mensaje, tipo = 'success') => {
-    setToast({ visible: true, mensaje, tipo });
   };
 
   return (
