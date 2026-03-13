@@ -20,7 +20,7 @@ function RankingCard({ titulo, emoji, datos, unidad }) {
     const medallas = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
     return (
         <div style={{ background: 'white', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', flex: 1, minWidth: '280px' }}>
-            <div style={{ fontWeight: '700', fontSize: '15px', color: '#1a1a2e', marginBottom: '16px' }}>{emoji} {titulo}</div>
+            <div style={{ fontWeight: '700', fontSize: '15px', color: 'inherit', marginBottom: '16px' }}>{emoji} {titulo}</div>
             {datos.map((u, i) => (
                 <div key={u.usuario_id} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                     <span style={{ fontSize: '18px', width: '24px' }}>{medallas[i]}</span>
@@ -31,7 +31,7 @@ function RankingCard({ titulo, emoji, datos, unidad }) {
                             {u.nombre[0].toUpperCase()}
                         </div>
                     )}
-                    <span style={{ flex: 1, fontSize: '13px', fontWeight: '600', color: '#1a1a2e' }}>{u.nombre}</span>
+                    <span style={{ flex: 1, fontSize: '13px', fontWeight: '600', color: 'inherit' }}>{u.nombre}</span>
                     <span style={{ fontSize: '13px', fontWeight: '700', color: i === 0 ? '#E76F51' : '#8338EC' }}>
                         {unidad === '€' ? `${u.valor.toFixed(2)} €` : `${Math.round(u.valor)} min`}
                     </span>
@@ -186,7 +186,7 @@ function ComunidadPage() {
             <div className="perfil-seccion-titulo" style={{ marginTop: '32px' }}>🏆 Ranking mensual</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                 <button onClick={() => setMesRanking(subMonths(mesRanking, 1))} style={btnNav}>◀</button>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#444', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#dddddd', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
                     {format(mesRanking, 'MMMM yyyy', { locale: es })}
                 </span>
                 <button onClick={() => setMesRanking(addMonths(mesRanking, 1))} disabled={esMesActual}

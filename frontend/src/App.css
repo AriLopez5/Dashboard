@@ -947,3 +947,98 @@ body.tema-oscuro .modal-btn-cancelar {
     grid-template-columns: 1fr;
   }
 }
+/* ============================================ */
+/* TEMA OSCURO                                  */
+/* ============================================ */
+
+.tema-oscuro .chart-container,
+.tema-oscuro .stat-card,
+.tema-oscuro .card,
+.tema-oscuro .day-group,
+.tema-oscuro .perfil-header-card,
+.tema-oscuro .perfil-stat-card,
+.tema-oscuro .modal-box {
+  background: #2a2a3e !important;
+  color: #e0e0e0 !important;
+}
+
+/* Textos */
+.tema-oscuro .chart-container h2,
+.tema-oscuro .perfil-nombre,
+.tema-oscuro .perfil-stat-value,
+.tema-oscuro .perfil-seccion-titulo,
+.tema-oscuro .stat-value,
+.tema-oscuro .item-descripcion,
+.tema-oscuro .day-date {
+  color: #e0e0e0 !important;
+}
+
+.tema-oscuro .perfil-stat-label,
+.tema-oscuro .stat-label,
+.tema-oscuro .item-time,
+.tema-oscuro .chart-container p {
+  color: #aaaaaa !important;
+}
+
+/* Items de lista */
+.tema-oscuro .item {
+  background: #33334a !important;
+  color: #e0e0e0 !important;
+}
+
+.tema-oscuro .item-descripcion {
+  color: #e0e0e0 !important;
+}
+
+/* Top categorías en Dashboard */
+.tema-oscuro .chart-container div[style*="background"] {
+  background: #33334a !important;
+  color: #e0e0e0 !important;
+}
+
+/* SelectorMes */
+.tema-oscuro div[style*="background: white"],
+.tema-oscuro div[style*="background: rgb(255, 255, 255)"] {
+  background: #2a2a3e !important;
+  color: #e0e0e0 !important;
+}
+
+/* Ranking cards en Comunidad */
+.tema-oscuro div[style*="background: white"] {
+  background: #2a2a3e !important;
+  color: #e0e0e0 !important;
+}
+
+/* Textos dentro de ranking */
+.tema-oscuro div[style*="color: #1a1a2e"] {
+  color: #e0e0e0 !important;
+}
+
+/* Calendario en Perfil */
+.tema-oscuro .calendario-dia {
+  background: #33334a !important;
+  color: #e0e0e0 !important;
+}
+
+.tema-oscuro .calendario-dia.vacio {
+  background: #22223a !important;
+}
+
+/* Formularios */
+.tema-oscuro .form-group input,
+.tema-oscuro .form-group select,
+.tema-oscuro .form-group textarea {
+  background: #33334a !important;
+  color: #e0e0e0 !important;
+  border-color: #555 !important;
+}
+
+.tema-oscuro .form-group label {
+  color: #e0e0e0 !important;
+}
+
+/* Botón nav selector mes */
+.tema-oscuro button[style*="background: #f0f0f0"] {
+  background: #444 !important;
+  color: #e0e0e0 !important;
+}

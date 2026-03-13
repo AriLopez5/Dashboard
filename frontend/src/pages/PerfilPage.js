@@ -112,10 +112,10 @@ function CalendarioActividad({ gastos, entrenamientos }) {
         >
             {/* Cabecera con selector */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-                <span style={{ fontWeight: '700', fontSize: '15px', color: '#1a1a2e' }}>Registro diario</span>
+                <span style={{ fontWeight: '700', fontSize: '15px', color: 'inherit' }}>Registro diario</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <button onClick={() => { setMes(subMonths(mes, 1)); setTooltipDia(null); }} style={btnNavStyle}>◀</button>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#444', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: 'inherit', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
                         {format(mes, 'MMMM yyyy', { locale: es })}
                     </span>
                     <button
@@ -246,13 +246,13 @@ function CalendarioActividad({ gastos, entrenamientos }) {
 
             {/* Leyenda */}
             <div style={{ marginTop: '16px', borderTop: '1px solid #f0f0f0', paddingTop: '12px' }}>
-                <div style={{ fontSize: '11px', fontWeight: '700', color: '#bbb', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leyenda</div>
+                <div style={{ fontSize: '11px', fontWeight: '700', color: '#dddddd', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Leyenda</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 14px' }}>
                     {Object.entries(EMOJI_GASTO).map(([cat, em]) => (
-                        <span key={cat} style={{ fontSize: '12px', color: '#666' }}>{em} <span style={{ textTransform: 'capitalize' }}>{cat}</span></span>
+                        <span key={cat} style={{ fontSize: '12px', color: '#dddddd' }}>{em} <span style={{ textTransform: 'capitalize' }}>{cat}</span></span>
                     ))}
                     {Object.entries(EMOJI_DEPORTE).map(([tipo, em]) => (
-                        <span key={tipo} style={{ fontSize: '12px', color: '#666' }}>{em} <span style={{ textTransform: 'capitalize' }}>{tipo}</span></span>
+                        <span key={tipo} style={{ fontSize: '12px', color: '#dddddd' }}>{em} <span style={{ textTransform: 'capitalize' }}>{tipo}</span></span>
                     ))}
                 </div>
             </div>
