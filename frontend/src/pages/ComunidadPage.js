@@ -186,7 +186,7 @@ function ComunidadPage() {
             <div className="perfil-seccion-titulo" style={{ marginTop: '32px' }}>🏆 Ranking mensual</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
                 <button onClick={() => setMesRanking(subMonths(mesRanking, 1))} style={btnNav}>◀</button>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#dddddd', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
+                <span style={{ fontSize: '13px', fontWeight: '600', color: 'inherit', textTransform: 'capitalize', minWidth: '105px', textAlign: 'center' }}>
                     {format(mesRanking, 'MMMM yyyy', { locale: es })}
                 </span>
                 <button onClick={() => setMesRanking(addMonths(mesRanking, 1))} disabled={esMesActual}

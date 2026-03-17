@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
         const cognitoUser = userPool.getCurrentUser();
         if (cognitoUser) cognitoUser.signOut();
         setUser(null);
+        window.location.href = '/';
         clearTimeout(timerRef.current);
     }, []);
 
