@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
 function LoginPage() {
     const { login } = useAuth();
@@ -16,6 +17,13 @@ function LoginPage() {
         setLoading(true);
         try {
             await login(email, password);
+            // Suscribir a SNS (no bloqueante)
+            fetch(`${API_URL}/suscribir`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario_id: email, email: email })
+            }).catch(() => { }); // ignorar errores para no bloquear el login
+
             navigate('/dashboard');
         } catch (err) {
             if (err.code === 'NotAuthorizedException') {
