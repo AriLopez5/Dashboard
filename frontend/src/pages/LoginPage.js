@@ -129,6 +129,15 @@ function LoginPage() {
                     >
                         {loading ? 'Iniciando sesión...' : 'Entrar'}
                     </button>
+                    <p style={{ textAlign: 'center', fontSize: '13px', color: '#888', margin: 0 }}>
+                        ¿No tienes cuenta?{' '}
+                        <span
+                            onClick={() => navigate('/register')}
+                            style={{ color: '#8338EC', fontWeight: '700', cursor: 'pointer' }}
+                        >
+                            Regístrate
+                        </span>
+                    </p>
                 </div>
             </div>
         </div>

@@ -12,7 +12,7 @@ import LoginPage from './pages/LoginPage';
 import NotFoundPage from './pages/NotFoundPage';
 import Toast from './components/Toast';
 import { AuthProvider, useAuth } from './auth/AuthContext';
-
+import RegisterPage from './pages/RegisterPage';
 const API_URL = 'https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod';
 
 // ── Componente que protege las rutas privadas ─────────────────────────────────
@@ -192,7 +192,7 @@ function AppInner() {
         {/* Rutas públicas */}
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
-
+        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
         {/* Rutas privadas */}
         <Route path="/*" element={
           <PrivateRoute>
