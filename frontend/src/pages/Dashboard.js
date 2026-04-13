@@ -1,15 +1,35 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { useState } from 'react';
 import GastosPorCategoria from '../components/GastosPorCategoria';
 import EvolucionGastos from '../components/EvolucionGastos';
 import EntrenamientosPorTipo from '../components/EntrenamientosPorTipo';
 import ComparativaMensual from '../components/ComparativaMensual';
+import SelectorMes from '../components/SelectorMes';
 import { exportarGastosCSV, exportarEntrenamientosCSV } from '../utils/exportarCSV';
 import { SkeletonDashboard } from '../components/SkeletonLoader';
 
 function Dashboard({ gastos, entrenamientos, loading }) {
 
-    const totalGastos = gastos.reduce((sum, g) => sum + parseFloat(g.cantidad), 0);
-    const minutosEntrenamiento = entrenamientos.reduce((sum, e) => sum + (e.duracion || 0), 0);
+    const [mesGastosSeleccionado, setMesGastosSeleccionado] = useState(new Date());
+    const [mesEntrenamientosSeleccionado, setMesEntrenamientosSeleccionado] = useState(new Date());
+
+    const mesClaveGastos = `${mesGastosSeleccionado.getFullYear()}-${String(mesGastosSeleccionado.getMonth() + 1).padStart(2, '0')}`;
+    const mesClaveEntrenamientos = `${mesEntrenamientosSeleccionado.getFullYear()}-${String(mesEntrenamientosSeleccionado.getMonth() + 1).padStart(2, '0')}`;
+    const mesEtiquetaGastos = mesGastosSeleccionado.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    const mesEtiquetaEntrenamientos = mesEntrenamientosSeleccionado.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    const obtenerMes = (fecha) => {
+        if (!fecha) return null;
+        if (typeof fecha === 'string' && /^\d{4}-\d{2}/.test(fecha)) return fecha.slice(0, 7);
+        const fechaParseada = new Date(fecha);
+        if (Number.isNaN(fechaParseada.getTime())) return null;
+        return `${fechaParseada.getFullYear()}-${String(fechaParseada.getMonth() + 1).padStart(2, '0')}`;
+    };
+
+    const gastosMesActual = gastos.filter(g => obtenerMes(g.fecha) === mesClaveGastos);
+    const entrenamientosMesActual = entrenamientos.filter(e => obtenerMes(e.fecha) === mesClaveEntrenamientos);
+
+    const totalGastosMesActual = gastosMesActual.reduce((sum, g) => sum + parseFloat(g.cantidad || 0), 0);
+    const minutosEntrenamientoMesActual = entrenamientosMesActual.reduce((sum, e) => sum + (e.duracion || 0), 0);
     const gastosPorCategoria = gastos.reduce((acc, g) => {
         const cat = g.categoria || 'otros';
         acc[cat] = (acc[cat] || 0) + parseFloat(g.cantidad);
@@ -42,13 +62,15 @@ function Dashboard({ gastos, entrenamientos, loading }) {
                     <div className="stats-container">
                         <div className="stat-card">
                             <h3>💰 Total Gastado</h3>
-                            <div className="stat-value">{totalGastos.toFixed(2)} €</div>
-                            <div className="stat-label">{gastos.length} gastos</div>
+                            <SelectorMes mesSeleccionado={mesGastosSeleccionado} onCambiarMes={setMesGastosSeleccionado} compact />
+                            <div className="stat-value">{totalGastosMesActual.toFixed(2)} €</div>
+                            <div className="stat-label">{gastosMesActual.length} gastos ({mesEtiquetaGastos})</div>
                         </div>
                         <div className="stat-card">
                             <h3>💪 Entrenamientos</h3>
-                            <div className="stat-value">{entrenamientos.length}</div>
-                            <div className="stat-label">{minutosEntrenamiento} minutos</div>
+                            <SelectorMes mesSeleccionado={mesEntrenamientosSeleccionado} onCambiarMes={setMesEntrenamientosSeleccionado} compact />
+                            <div className="stat-value">{entrenamientosMesActual.length}</div>
+                            <div className="stat-label">{minutosEntrenamientoMesActual} minutos ({mesEtiquetaEntrenamientos})</div>
                         </div>
                     </div>
 

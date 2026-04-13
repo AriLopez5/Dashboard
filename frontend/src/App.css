@@ -80,6 +80,7 @@
   box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
+  text-align: center;
 }
 
 .stat-card::before {
