@@ -82,8 +82,34 @@ jobs:
           failed=0
           for dir in "${DIRS[@]}"; do
             name="$(basename "$dir")"
-            function_name="${LAMBDA_FUNCTION_PREFIX}${name}"
             zip_path="/tmp/${name}.zip"
+
+            name_dash="${name//_/-}"
+            name_underscore="${name//-/_}"
+
+            declare -a CANDIDATES=(
+              "${LAMBDA_FUNCTION_PREFIX}${name}"
+              "${LAMBDA_FUNCTION_PREFIX}${name_dash}"
+              "${LAMBDA_FUNCTION_PREFIX}${name_underscore}"
+              "${name}"
+              "${name_dash}"
+              "${name_underscore}"
+            )
+
+            function_name=""
+            for candidate in "${CANDIDATES[@]}"; do
+              if aws lambda get-function --function-name "$candidate" > /dev/null 2>&1; then
+                function_name="$candidate"
+                break
+              fi
+            done
+
+            if [[ -z "$function_name" ]]; then
+              echo "ERROR: No se encontró Lambda para carpeta '${name}'"
+              echo "Candidatos probados: ${CANDIDATES[*]}"
+              failed=1
+              continue
+            fi
 
             echo "Empaquetando ${name}..."
             (
