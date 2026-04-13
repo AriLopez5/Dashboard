@@ -1,0 +1,111 @@
+name: Deploy Backend Lambdas to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/lambdas/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+    inputs:
+      only_function:
+        description: 'Nombre de carpeta Lambda a desplegar (opcional, ej: crear-gasto)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Si es true, solo valida y lista Lambdas sin desplegar'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-north-1
+      LAMBDA_FUNCTION_PREFIX: ${{ vars.LAMBDA_FUNCTION_PREFIX }}
+      ONLY_FUNCTION: ${{ github.event.inputs.only_function }}
+      DRY_RUN: ${{ github.event.inputs.dry_run }}
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Validar carpeta de lambdas
+        run: |
+          test -d backend/lambdas || { echo "No existe backend/lambdas"; exit 1; }
+
+      - name: Desplegar funciones Lambda
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          shopt -s nullglob
+
+          declare -a DIRS=()
+          if [[ -n "${ONLY_FUNCTION:-}" ]]; then
+            if [[ -d "backend/lambdas/${ONLY_FUNCTION}" ]]; then
+              DIRS+=("backend/lambdas/${ONLY_FUNCTION}")
+            else
+              echo "La función '${ONLY_FUNCTION}' no existe en backend/lambdas"
+              exit 1
+            fi
+          else
+            for dir in backend/lambdas/*; do
+              [[ -d "$dir" ]] && DIRS+=("$dir")
+            done
+          fi
+
+          if [[ ${#DIRS[@]} -eq 0 ]]; then
+            echo "No se encontraron lambdas para desplegar"
+            exit 1
+          fi
+
+          echo "Funciones detectadas:"
+          for dir in "${DIRS[@]}"; do
+            echo "- $(basename "$dir")"
+          done
+
+          if [[ "${DRY_RUN:-false}" == "true" ]]; then
+            echo "DRY RUN activado: no se subirá código"
+            exit 0
+          fi
+
+          failed=0
+          for dir in "${DIRS[@]}"; do
+            name="$(basename "$dir")"
+            function_name="${LAMBDA_FUNCTION_PREFIX}${name}"
+            zip_path="/tmp/${name}.zip"
+
+            echo "Empaquetando ${name}..."
+            (
+              cd "$dir"
+              zip -rq "$zip_path" . -x "__pycache__/*" "*.pyc" "*.pyo" ".DS_Store"
+            )
+
+            echo "Desplegando ${function_name}..."
+            if aws lambda update-function-code \
+              --function-name "$function_name" \
+              --zip-file "fileb://$zip_path" \
+              --publish > /dev/null; then
+              echo "OK: ${function_name}"
+            else
+              echo "ERROR: ${function_name}"
+              failed=1
+            fi
+          done
+
+          if [[ $failed -ne 0 ]]; then
+            echo "Una o más funciones fallaron en despliegue"
+            exit 1
+          fi
+
+          echo "Despliegue backend completado"
