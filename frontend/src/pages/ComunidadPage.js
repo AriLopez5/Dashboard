@@ -45,13 +45,60 @@ function ComunidadPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [mesRanking, setMesRanking] = useState(new Date());
+    const hoy = new Date();
+    const hoyStr = format(hoy, 'yyyy-MM-dd');
+    const inicioMesStr = format(new Date(hoy.getFullYear(), hoy.getMonth(), 1), 'yyyy-MM-dd');
+    const [fechaInicio, setFechaInicio] = useState(inicioMesStr);
+    const [fechaFin, setFechaFin] = useState(hoyStr);
+    const [rankingRango, setRankingRango] = useState({ gastos: [], deporte: [] });
+    const [errorRango, setErrorRango] = useState('');
+    const [cargandoRango, setCargandoRango] = useState(false);
 
     useEffect(() => {
         fetch(`${API_URL}/comunidad`)
             .then(r => r.json())
-            .then(data => { setDatos(data); setLoading(false); })
+            .then(data => {
+                setDatos(data);
+                if (data?.ranking_por_rango) {
+                    setRankingRango({
+                        gastos: data.ranking_por_rango.gastos || [],
+                        deporte: data.ranking_por_rango.deporte || []
+                    });
+                }
+                setLoading(false);
+            })
             .catch(() => { setError('Error al cargar los datos'); setLoading(false); });
     }, []);
+
+    const aplicarRango = async () => {
+        if (!fechaInicio || !fechaFin) {
+            setErrorRango('Selecciona fecha inicio y fecha fin');
+            return;
+        }
+        if (fechaInicio > fechaFin) {
+            setErrorRango('La fecha inicio no puede ser mayor que la fecha fin');
+            return;
+        }
+
+        setErrorRango('');
+        setCargandoRango(true);
+        try {
+            const res = await fetch(`${API_URL}/comunidad?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}`);
+            const data = await res.json();
+            if (!res.ok || data?.error) {
+                setErrorRango(data?.error || 'Error al cargar ranking por rango');
+                return;
+            }
+            setRankingRango({
+                gastos: data?.ranking_por_rango?.gastos || [],
+                deporte: data?.ranking_por_rango?.deporte || []
+            });
+        } catch {
+            setErrorRango('Error al cargar ranking por rango');
+        } finally {
+            setCargandoRango(false);
+        }
+    };
 
     if (loading) return (
         <div>
@@ -195,6 +242,47 @@ function ComunidadPage() {
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <RankingCard titulo="Más gastado" emoji="💸" datos={rankingMes.gastos} unidad="€" />
                 <RankingCard titulo="Más deporte" emoji="🏋️" datos={rankingMes.deporte} unidad="min" />
+            </div>
+
+            {/* Ranking por rango de fechas */}
+            <div className="perfil-seccion-titulo" style={{ marginTop: '32px' }}>🗓️ Ranking por rango de fechas</div>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '16px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '600' }}>Desde</label>
+                <input
+                    type="date"
+                    value={fechaInicio}
+                    max={hoyStr}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                    style={{ padding: '8px 10px', border: '1px solid #ddd', borderRadius: '8px' }}
+                />
+                <label style={{ fontSize: '13px', fontWeight: '600' }}>Hasta</label>
+                <input
+                    type="date"
+                    value={fechaFin}
+                    max={hoyStr}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    style={{ padding: '8px 10px', border: '1px solid #ddd', borderRadius: '8px' }}
+                />
+                <button
+                    onClick={aplicarRango}
+                    disabled={cargandoRango}
+                    style={{
+                        padding: '8px 14px',
+                        border: 'none',
+                        borderRadius: '8px',
+                        background: cargandoRango ? '#ccc' : '#667eea',
+                        color: 'white',
+                        fontWeight: '600',
+                        cursor: cargandoRango ? 'not-allowed' : 'pointer'
+                    }}
+                >
+                    {cargandoRango ? 'Cargando...' : 'Aplicar rango'}
+                </button>
+            </div>
+            {errorRango && <div className="empty-message" style={{ marginBottom: '12px' }}>{errorRango}</div>}
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                <RankingCard titulo="Más gastado (rango)" emoji="💸" datos={rankingRango.gastos} unidad="€" />
+                <RankingCard titulo="Más deporte (rango)" emoji="🏋️" datos={rankingRango.deporte} unidad="min" />
             </div>
         </div>
     );
