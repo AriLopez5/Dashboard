@@ -25,11 +25,14 @@ Función Lambda que crea un nuevo gasto en DynamoDB.
     "cantidad": 15.50,
     "categoria": "alimentacion",
     "descripcion": "Menu del dia",
-    "usuario_id": "default_user",
+    "usuario_id": "email@ejemplo.com",
     "created_at": "2026-02-23T14:30:00"
   }
 }
 ```
+
+## Notas
+- `usuario_id` se asocia al usuario autenticado (email de Cognito en el flujo actual).
 
 ## Permisos necesarios
 - `dynamodb:PutItem` en tabla `gastos`

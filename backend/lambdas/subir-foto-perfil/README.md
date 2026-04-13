@@ -8,7 +8,7 @@ Función Lambda que recibe una imagen en base64 y la sube al bucket S3 `tfg-dash
 ## Request Body
 ```json
 {
-  "usuario_id": "arilopgal@gmail.com",
+  "usuario_id": "email@ejemplo.com",
   "extension": "jpg",
   "imagen_b64": "/9j/4AAQSkZJRgABAQAAAQABAAD..."
 }
@@ -22,7 +22,7 @@ Función Lambda que recibe una imagen en base64 y la sube al bucket S3 `tfg-dash
 ## Response (200 OK)
 ```json
 {
-  "foto_url": "https://tfg-dashboard-fotos.s3.eu-north-1.amazonaws.com/perfiles/arilopgal_gmail.com.jpg"
+  "foto_url": "https://tfg-dashboard-fotos.s3.eu-north-1.amazonaws.com/perfiles/email@ejemplo.com.jpg"
 }
 ```
 

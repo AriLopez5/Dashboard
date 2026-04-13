@@ -20,7 +20,7 @@ Función Lambda que recupera todos los entrenamientos de DynamoDB.
       "tipo": "Gimnasio",
       "duracion": 60,
       "ejercicios": "Pecho y tríceps",
-      "usuario_id": "default_user",
+      "usuario_id": "email@ejemplo.com",
       "created_at": "2026-02-24T10:30:00"
     },
     ...

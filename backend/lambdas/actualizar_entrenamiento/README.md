@@ -37,7 +37,7 @@ Todos los campos son opcionales. Solo se actualizarán los campos enviados.
     "duracion": 75,
     "ejercicios": "Piernas - 4x12 sentadillas, 3x15 prensa",
     "fecha": "2026-02-24",
-    "usuario_id": "default_user",
+    "usuario_id": "email@ejemplo.com",
     "created_at": "2026-02-23T18:00:00",
     "updated_at": "2026-02-24T19:30:00"
   }

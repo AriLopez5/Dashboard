@@ -58,7 +58,7 @@
 
 ### Base de datos
 - DynamoDB para almacenamiento NoSQL
-- Tablas: `gastos`, `deporte`, `perfiles`
+- Tablas: `gastos`, `deporte`, `perfiles`, `metas`
 
 ### Almacenamiento de archivos
 - S3 bucket `tfg-dashboard-fotos` para fotos de perfil
@@ -68,6 +68,7 @@
 ### API
 - API Gateway REST
 - CORS habilitado en todos los endpoints
+- 15 funciones Lambda activas en backend
 
 ## Flujo de datos
 
@@ -94,17 +95,29 @@
 ### Gastos
 - `GET /gastos` - Listar todos los gastos
 - `POST /gastos` - Crear nuevo gasto
+- `PUT /gastos/{id}` - Actualizar gasto
 - `DELETE /gastos/{id}` - Eliminar gasto
 
 ### Deporte
 - `GET /entrenamientos` - Listar todos los entrenamientos
 - `POST /entrenamientos` - Crear nuevo entrenamiento
+- `PUT /entrenamientos/{id}` - Actualizar entrenamiento
 - `DELETE /entrenamientos/{id}` - Eliminar entrenamiento
+
+### Metas
+- `GET /metas?usuario_id={email}&mes={YYYY-MM}` - Obtener metas mensuales
+- `POST /metas` - Guardar/actualizar metas mensuales
 
 ### Perfil
 - `GET /perfil` - Obtener datos del perfil
 - `POST /perfil` - Guardar/actualizar perfil
 - `POST /foto` - Subir foto de perfil a S3
+
+### Comunidad
+- `POST /suscribir-usuario` - Suscribir usuario por email en SNS
+
+### Global
+- `GET /resumen-global` - Obtener resumen consolidado de usuarios
 
 ## 🗂️ Infraestructura AWS
 
@@ -115,7 +128,11 @@
 | CloudFront | `EGQ2UR6H5V9UY` | CDN frontend |
 | Cognito | `eu-north-1_sY2obhHwM` | Autenticación |
 | API Gateway | `q5cdb6cw0d` | REST API |
-| DynamoDB | `gastos`, `deporte`, `perfiles` | Base de datos |
+| DynamoDB | `gastos`, `deporte`, `perfiles`, `metas` | Base de datos |
+| SNS | topics `dashboard-*` | Suscripciones por email |
 
 ## 🌍 Región
 - `eu-north-1` (Estocolmo)
+
+## Última actualización
+10 Abril 2026 - Añadidos módulo de metas, suscripciones y resumen global

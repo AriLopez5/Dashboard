@@ -1,27 +1,41 @@
 # Infraestructura como Código (IaC)
 
-Configuración de la infraestructura AWS usando Terraform o CloudFormation.
+Esta carpeta está preparada para alojar la infraestructura como código del proyecto (Terraform o CloudFormation).
 
-## Recursos AWS
+## Estado actual
 
-- Lambda Functions
-- DynamoDB Tables
-- API Gateway
-- S3 Buckets
-- CloudFront Distribution
-- IAM Roles y Policies
+✅ Infraestructura desplegada en AWS, pero **sin plantillas IaC versionadas aún** en esta carpeta.
 
-## Comandos
-```bash
-# Terraform
-terraform init
-terraform plan
-terraform apply
+## Recursos activos del proyecto
 
-# CloudFormation
-aws cloudformation deploy --template-file template.yaml --stack-name tfg-dashboard
+- API Gateway (`q5cdb6cw0d`)
+- Funciones Lambda (módulos gastos, deporte, metas, perfil, comunidad y resumen global)
+- DynamoDB (`gastos`, `deporte`, `perfiles`, `metas`)
+- S3 frontend (`tfg-dashboard`)
+- S3 fotos de perfil (`tfg-dashboard-fotos`)
+- CloudFront (`EGQ2UR6H5V9UY`)
+- Cognito User Pool (`eu-north-1_sY2obhHwM`)
+- SNS (topics `dashboard-*` para suscripciones)
+
+## Estructura recomendada (siguiente paso)
+
+```text
+infrastructure/
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   └── environments/
+│       ├── dev.tfvars
+│       └── prod.tfvars
+└── README.md
 ```
 
-## Estado
+## Objetivo
 
-🚧 En desarrollo
+- Versionar la infraestructura para despliegues repetibles.
+- Reducir configuración manual en consola AWS.
+- Facilitar auditoría y trazabilidad de cambios.
+
+## Última actualización
+13 Abril 2026

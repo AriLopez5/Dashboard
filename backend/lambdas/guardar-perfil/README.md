@@ -8,9 +8,9 @@ Función Lambda que guarda o actualiza los datos del perfil de un usuario en Dyn
 ## Request Body
 ```json
 {
-  "usuario_id": "arilopgal@gmail.com",
-  "nombre": "Ari",
-  "foto_url": "https://tfg-dashboard-fotos.s3.eu-north-1.amazonaws.com/perfiles/arilopgal_gmail.com.jpg"
+  "usuario_id": "email@ejemplo.com",
+  "nombre": "User",
+  "foto_url": "https://tfg-dashboard-fotos.s3.eu-north-1.amazonaws.com/perfiles/email@ejemplo.com.jpg"
 }
 ```
 

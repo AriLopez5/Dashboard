@@ -14,9 +14,12 @@ backend/
 │   ├── listar_entrenamientos/
 │   ├── actualizar_entrenamiento/
 │   ├── eliminar_entrenamiento/
+│   ├── guardar-metas/
+│   ├── obtener-metas/
 │   ├── guardar-perfil/
 │   ├── obtener-perfil/
 │   ├── subir-foto-perfil/
+│   ├── suscribir-usuario/
 │   └── obtener-resumen-global/
 └── layers/
 ```
@@ -67,26 +70,45 @@ backend/
 - **Descripción:** Elimina un entrenamiento
 - **Tabla:** `deporte`
 
+### Módulo Metas ✨ NUEVO
+
+#### 9. guardar-metas
+- **Endpoint:** `POST /metas`
+- **Descripción:** Guarda o actualiza metas mensuales (presupuesto y sesiones) por usuario
+- **Tabla:** `metas`
+
+#### 10. obtener-metas
+- **Endpoint:** `GET /metas?usuario_id={email}&mes={YYYY-MM}`
+- **Descripción:** Obtiene las metas mensuales de un usuario para un mes concreto
+- **Tabla:** `metas`
+
 ### Módulo Perfil ✨ NUEVO
 
-#### 9. guardar-perfil
+#### 11. guardar-perfil
 - **Endpoint:** `POST /perfil`
 - **Descripción:** Guarda o actualiza el perfil de usuario
 - **Tabla:** `perfiles`
 
-#### 10. obtener-perfil
+#### 12. obtener-perfil
 - **Endpoint:** `GET /perfil`
 - **Descripción:** Obtiene el perfil de un usuario
 - **Tabla:** `perfiles`
 
-#### 11. subir-foto-perfil
-- **Endpoint:** `POST /perfil/foto`
+#### 13. subir-foto-perfil
+- **Endpoint:** `POST /foto`
 - **Descripción:** Sube una foto de perfil a S3 y actualiza el perfil
 - **Tabla:** `perfiles` + S3 Bucket
 
+### Módulo Comunidad ✨ NUEVO
+
+#### 14. suscribir-usuario
+- **Endpoint:** `POST /suscribir-usuario`
+- **Descripción:** Crea/reutiliza un topic SNS y suscribe el email del usuario para notificaciones
+- **Servicio:** `Amazon SNS`
+
 ### Módulo Global ✨ NUEVO
 
-#### 12. obtener-resumen-global
+#### 15. obtener-resumen-global
 - **Endpoint:** `GET /resumen-global`
 - **Descripción:** Obtiene resumen consolidado de todos los usuarios (gastos y entrenamientos)
 - **Tablas:** `gastos`, `deporte`, `perfiles`
@@ -97,4 +119,4 @@ https://q5cdb6cw0d.execute-api.eu-north-1.amazonaws.com/prod
 ```
 
 ## Última actualización
-11 Marzo 2026 - Sistema completo con perfiles y resumen global
+10 Abril 2026 - Añadidas metas mensuales y suscripción de usuario

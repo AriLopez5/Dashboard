@@ -15,11 +15,12 @@
 - [x] CI/CD con GitHub Actions
 
 ### Fase 2: Infraestructura AWS ✅
-- [x] Tablas DynamoDB (`gastos`, `deporte`, `perfiles`)
+- [x] Tablas DynamoDB (`gastos`, `deporte`, `perfiles`, `metas`)
 - [x] Funciones Lambda en Python
 - [x] API Gateway REST con CORS
 - [x] S3 + CloudFront para frontend
 - [x] S3 bucket para fotos de perfil
+- [x] Amazon SNS para suscripciones por email
 
 ### Fase 3: Frontend — Módulo Gastos ✅
 - [x] Formulario añadir gastos
@@ -39,6 +40,16 @@
 - [x] Resumen general
 - [x] Comparativa mensual gastos vs deporte
 - [x] Selector de mes
+- [x] Resumen global multiusuario
+
+### Fase 5.1: Metas mensuales ✅
+- [x] Guardado de metas de presupuesto mensual
+- [x] Guardado de meta mensual de sesiones
+- [x] Consulta de metas por usuario y mes
+
+### Fase 5.2: Comunidad y notificaciones ✅
+- [x] Suscripción de usuario por email (SNS)
+- [x] Creación/reutilización de topic por usuario
 
 ### Fase 6: Autenticación ✅
 - [x] Amazon Cognito User Pool
@@ -67,6 +78,7 @@
 - [ ] Expiración de sesión por inactividad (5 min)
 
 ### Fase 10: Documentación y defensa
+- [x] Documentación técnica de backend (README por Lambda)
 - [ ] Memoria del TFG
 - [ ] Presentación
 - [ ] Ensayo defensa
@@ -79,5 +91,6 @@
 | Backend funcional | Febrero 2026 |
 | Frontend completo | Marzo 2026 |
 | Autenticación y perfil | Marzo 2026 |
+| Metas y comunidad | Abril 2026 |
 | Documentación | Abril - Mayo 2026 |
 | **Entrega TFG** | **18 de mayo de 2026** |

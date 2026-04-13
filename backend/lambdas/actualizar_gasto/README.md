@@ -38,7 +38,7 @@ Todos los campos son opcionales. Solo se actualizarán los campos enviados.
     "categoria": "transporte",
     "descripcion": "Gasolina",
     "fecha": "2026-02-24",
-    "usuario_id": "default_user",
+    "usuario_id": "email@ejemplo.com",
     "created_at": "2026-02-23T10:30:00",
     "updated_at": "2026-02-24T15:45:00"
   }

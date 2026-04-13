@@ -32,7 +32,7 @@ Función Lambda que crea un nuevo entrenamiento en DynamoDB.
     "tipo": "Gimnasio",
     "duracion": 60,
     "ejercicios": "Pecho y tríceps - 3x10 press banca",
-    "usuario_id": "default_user",
+    "usuario_id": "email@ejemplo.com",
     "created_at": "2026-02-24T10:30:00"
   }
 }
