@@ -86,18 +86,10 @@ jobs:
             name="$(basename "$dir")"
             zip_path="/tmp/${name}.zip"
 
-            explicit_target=""
-            case "$name" in
-              listar_entrenamientos)
-                explicit_target="${LAMBDA_FUNCTION_PREFIX}listar-entrenamiento"
-                ;;
-            esac
-
             name_dash="${name//_/-}"
             name_underscore="${name//-/_}"
 
             declare -a CANDIDATES=(
-              "$explicit_target"
               "${LAMBDA_FUNCTION_PREFIX}${name}"
               "${LAMBDA_FUNCTION_PREFIX}${name_dash}"
               "${LAMBDA_FUNCTION_PREFIX}${name_underscore}"

@@ -8,12 +8,12 @@ backend/
 ├── lambdas/
 │   ├── crear-gasto/
 │   ├── listar-gasto/
-│   ├── actualizar_gasto/
-│   ├── eliminar_gasto/
-│   ├── crear_entrenamiento/
-│   ├── listar_entrenamientos/
-│   ├── actualizar_entrenamiento/
-│   ├── eliminar_entrenamiento/
+│   ├── actualizar-gasto/
+│   ├── eliminar-gasto/
+│   ├── crear-entrenamiento/
+│   ├── listar-entrenamiento/
+│   ├── actualizar-entrenamiento/
+│   ├── eliminar-entrenamiento/
 │   ├── guardar-metas/
 │   ├── obtener-metas/
 │   ├── guardar-perfil/
@@ -38,34 +38,34 @@ backend/
 - **Descripción:** Lista todos los gastos guardados (con filtros opcionales)
 - **Tabla:** `gastos`
 
-#### 3. actualizar_gasto
+#### 3. actualizar-gasto
 - **Endpoint:** `PUT /gastos/{id}`
 - **Descripción:** Actualiza un gasto existente
 - **Tabla:** `gastos`
 
-#### 4. eliminar_gasto
+#### 4. eliminar-gasto
 - **Endpoint:** `DELETE /gastos/{id}`
 - **Descripción:** Elimina un gasto
 - **Tabla:** `gastos`
 
 ### Módulo Deporte
 
-#### 5. crear_entrenamiento
+#### 5. crear-entrenamiento
 - **Endpoint:** `POST /entrenamientos`
 - **Descripción:** Crea un nuevo entrenamiento en DynamoDB
 - **Tabla:** `deporte`
 
-#### 6. listar_entrenamientos
+#### 6. listar-entrenamiento
 - **Endpoint:** `GET /entrenamientos`
 - **Descripción:** Lista todos los entrenamientos guardados
 - **Tabla:** `deporte`
 
-#### 7. actualizar_entrenamiento
+#### 7. actualizar-entrenamiento
 - **Endpoint:** `PUT /entrenamientos/{id}`
 - **Descripción:** Actualiza un entrenamiento existente
 - **Tabla:** `deporte`
 
-#### 8. eliminar_entrenamiento
+#### 8. eliminar-entrenamiento
 - **Endpoint:** `DELETE /entrenamientos/{id}`
 - **Descripción:** Elimina un entrenamiento
 - **Tabla:** `deporte`
