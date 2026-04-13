@@ -13,6 +13,10 @@ on:
         description: 'Nombre de carpeta Lambda a desplegar (opcional, ej: crear-gasto)'
         required: false
         type: string
+      aws_function_name:
+        description: 'Nombre EXACTO de la función en AWS (opcional, recomendado para despliegue puntual)'
+        required: false
+        type: string
       dry_run:
         description: 'Si es true, solo valida y lista Lambdas sin desplegar'
         required: false
@@ -26,14 +30,15 @@ jobs:
       AWS_REGION: eu-north-1
       LAMBDA_FUNCTION_PREFIX: ${{ vars.LAMBDA_FUNCTION_PREFIX }}
       ONLY_FUNCTION: ${{ github.event.inputs.only_function }}
+      AWS_FUNCTION_NAME: ${{ github.event.inputs.aws_function_name }}
       DRY_RUN: ${{ github.event.inputs.dry_run }}
 
     steps:
       - name: Checkout código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar credenciales AWS
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -99,7 +104,19 @@ jobs:
             )
 
             function_name=""
+
+            if [[ -n "${AWS_FUNCTION_NAME:-}" ]]; then
+              if aws lambda get-function --function-name "${AWS_FUNCTION_NAME}" > /dev/null 2>&1; then
+                function_name="${AWS_FUNCTION_NAME}"
+              else
+                echo "ERROR: La función AWS_FUNCTION_NAME='${AWS_FUNCTION_NAME}' no existe o no es accesible"
+                failed=1
+                continue
+              fi
+            fi
+
             for candidate in "${CANDIDATES[@]}"; do
+              [[ -n "$function_name" ]] && break
               if aws lambda get-function --function-name "$candidate" > /dev/null 2>&1; then
                 function_name="$candidate"
                 break
@@ -145,6 +162,10 @@ jobs:
               --zip-file "fileb://$zip_path" \
               --publish > /dev/null; then
               echo "OK: ${function_name}"
+              aws lambda get-function \
+                --function-name "$function_name" \
+                --query 'Configuration.[FunctionName,Version,LastModified]' \
+                --output text
             else
               echo "ERROR: ${function_name}"
               failed=1

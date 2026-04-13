@@ -2,6 +2,7 @@ import json
 import boto3
 from decimal import Decimal
 from collections import defaultdict
+from datetime import datetime
 
 dynamodb = boto3.resource('dynamodb', region_name='eu-north-1')
 tabla_gastos = dynamodb.Table('gastos')
@@ -14,9 +15,51 @@ class DecimalEncoder(json.JSONEncoder):
             return float(obj)
         return super(DecimalEncoder, self).default(obj)
 
+def normalizar_fecha(fecha_raw):
+    if not fecha_raw:
+        return None
+
+    fecha_txt = str(fecha_raw).strip()
+    if not fecha_txt:
+        return None
+
+    fecha_base = fecha_txt.split('T')[0].split(' ')[0]
+
+    for fmt in ('%Y-%m-%d', '%d/%m/%Y'):
+        try:
+            return datetime.strptime(fecha_base, fmt).strftime('%Y-%m-%d')
+        except ValueError:
+            continue
+
+    return None
+
 def lambda_handler(event, context):
     print("=== INICIO ===")
     try:
+        query_params = event.get('queryStringParameters', {}) or {}
+        fecha_inicio = query_params.get('fecha_inicio')
+        fecha_fin = query_params.get('fecha_fin')
+
+        if (fecha_inicio and not fecha_fin) or (fecha_fin and not fecha_inicio):
+            return {
+                'statusCode': 400,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'Debes enviar fecha_inicio y fecha_fin juntos (YYYY-MM-DD)'})
+            }
+
+        if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
+            return {
+                'statusCode': 400,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'fecha_inicio no puede ser mayor que fecha_fin'})
+            }
+
         gastos = tabla_gastos.scan().get('Items', [])
         print(f"Gastos: {len(gastos)}")
         entrenamientos = tabla_deporte.scan().get('Items', [])
@@ -89,6 +132,35 @@ def lambda_handler(event, context):
                 )[:5],
             }
 
+        ranking_por_rango = None
+        if fecha_inicio and fecha_fin:
+            gastos_rango = defaultdict(float)
+            for g in gastos:
+                uid = g.get('usuario_id', 'desconocido')
+                fecha_normalizada = normalizar_fecha(g.get('fecha', ''))
+                if fecha_normalizada and fecha_inicio <= fecha_normalizada <= fecha_fin:
+                    gastos_rango[uid] += float(g.get('cantidad', 0))
+
+            deporte_rango = defaultdict(float)
+            for e in entrenamientos:
+                uid = e.get('usuario_id', 'desconocido')
+                fecha_normalizada = normalizar_fecha(e.get('fecha', ''))
+                if fecha_normalizada and fecha_inicio <= fecha_normalizada <= fecha_fin:
+                    deporte_rango[uid] += float(e.get('duracion', 0))
+
+            ranking_por_rango = {
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_fin,
+                'gastos': sorted(
+                    [fila(uid, val) for uid, val in gastos_rango.items()],
+                    key=lambda x: x['valor'], reverse=True
+                )[:5],
+                'deporte': sorted(
+                    [fila(uid, val) for uid, val in deporte_rango.items()],
+                    key=lambda x: x['valor'], reverse=True
+                )[:5],
+            }
+
         todos_usuarios = set(list(gastos_por_usuario.keys()) + list(deporte_por_usuario.keys()))
         usuarios_resumen = []
         for uid in todos_usuarios:
@@ -118,7 +190,8 @@ def lambda_handler(event, context):
                     'deporte_minutos': round(sum(float(e.get('duracion', 0)) for e in entrenamientos), 0),
                     'deporte_sesiones': len(entrenamientos),
                 },
-                'rankings_por_mes': rankings_por_mes
+                'rankings_por_mes': rankings_por_mes,
+                'ranking_por_rango': ranking_por_rango
             }, cls=DecimalEncoder)
         }
 
