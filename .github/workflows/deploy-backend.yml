@@ -69,6 +69,8 @@ jobs:
             exit 1
           fi
 
+          mapfile -t AWS_FUNCTIONS < <(aws lambda list-functions --query 'Functions[].FunctionName' --output text | tr '\t' '\n')
+
           echo "Funciones detectadas:"
           for dir in "${DIRS[@]}"; do
             echo "- $(basename "$dir")"
@@ -84,10 +86,18 @@ jobs:
             name="$(basename "$dir")"
             zip_path="/tmp/${name}.zip"
 
+            explicit_target=""
+            case "$name" in
+              listar_entrenamientos)
+                explicit_target="${LAMBDA_FUNCTION_PREFIX}listar-entrenamiento"
+                ;;
+            esac
+
             name_dash="${name//_/-}"
             name_underscore="${name//-/_}"
 
             declare -a CANDIDATES=(
+              "$explicit_target"
               "${LAMBDA_FUNCTION_PREFIX}${name}"
               "${LAMBDA_FUNCTION_PREFIX}${name_dash}"
               "${LAMBDA_FUNCTION_PREFIX}${name_underscore}"
@@ -103,6 +113,26 @@ jobs:
                 break
               fi
             done
+
+            if [[ -z "$function_name" ]]; then
+              target_norm="$(echo "${name}" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')"
+              target_sing="${target_norm%s}"
+
+              for aws_fn in "${AWS_FUNCTIONS[@]}"; do
+                fn_norm="$(echo "${aws_fn}" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')"
+                fn_sing="${fn_norm%s}"
+
+                if [[ "$fn_norm" == "$target_norm" || "$fn_norm" == "$target_sing" || "$fn_sing" == "$target_norm" || "$fn_sing" == "$target_sing" ]]; then
+                  function_name="$aws_fn"
+                  break
+                fi
+
+                if [[ "$fn_norm" == *"$target_norm" || "$fn_norm" == *"$target_sing" || "$target_norm" == *"$fn_norm" || "$target_sing" == *"$fn_sing" ]]; then
+                  function_name="$aws_fn"
+                  break
+                fi
+              done
+            fi
 
             if [[ -z "$function_name" ]]; then
               echo "ERROR: No se encontró Lambda para carpeta '${name}'"
