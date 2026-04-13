@@ -75,13 +75,12 @@
 - [x] HTTPS en todo el sistema
 - [x] CORS configurado
 - [x] IAM roles con permisos mínimos
-- [ ] Expiración de sesión por inactividad (5 min)
+- [x] Expiración de sesión por inactividad (5 min)
 
 ### Fase 10: Documentación y defensa
 - [x] Documentación técnica de backend (README por Lambda)
 - [ ] Memoria del TFG
 - [ ] Presentación
-- [ ] Ensayo defensa
 
 ## 📅 Fechas clave
 
