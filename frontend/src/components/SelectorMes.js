@@ -1,6 +1,6 @@
 import { format, subMonths, addMonths } from 'date-fns';
 
-function SelectorMes({ mesSeleccionado, onCambiarMes }) {
+function SelectorMes({ mesSeleccionado, onCambiarMes, compact = false }) {
   const handleMesAnterior = () => onCambiarMes(subMonths(mesSeleccionado, 1));
 
   const handleMesSiguiente = () => {
@@ -16,12 +16,12 @@ function SelectorMes({ mesSeleccionado, onCambiarMes }) {
     display: 'inline-flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: '15px',
-    padding: '10px 20px',
+    gap: compact ? '8px' : '15px',
+    padding: compact ? '8px 12px' : '10px 20px',
     color: 'white',
     border: 'none',
     borderRadius: '8px',
-    fontSize: '13px',
+    fontSize: compact ? '12px' : '13px',
     fontFamily: 'inherit',
     whiteSpace: 'nowrap',
     transition: 'all 0.3s',
@@ -33,12 +33,12 @@ function SelectorMes({ mesSeleccionado, onCambiarMes }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '15px',
-      marginBottom: '20px',
-      padding: '15px',
-      background: 'white',
-      borderRadius: '10px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      gap: compact ? '8px' : '15px',
+      marginBottom: compact ? '10px' : '20px',
+      padding: compact ? '8px' : '15px',
+      background: compact ? 'transparent' : 'white',
+      borderRadius: compact ? '8px' : '10px',
+      boxShadow: compact ? 'none' : '0 2px 8px rgba(0,0,0,0.1)',
       flexWrap: 'nowrap',
     }}>
       <style>{`
