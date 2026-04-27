@@ -70,7 +70,7 @@ backend/
 - **Descripción:** Elimina un entrenamiento
 - **Tabla:** `deporte`
 
-### Módulo Metas ✨ NUEVO
+### Módulo Metas 
 
 #### 9. guardar-metas
 - **Endpoint:** `POST /metas`
@@ -82,7 +82,7 @@ backend/
 - **Descripción:** Obtiene las metas mensuales de un usuario para un mes concreto
 - **Tabla:** `metas`
 
-### Módulo Perfil ✨ NUEVO
+### Módulo Perfil 
 
 #### 11. guardar-perfil
 - **Endpoint:** `POST /perfil`
@@ -99,14 +99,14 @@ backend/
 - **Descripción:** Sube una foto de perfil a S3 y actualiza el perfil
 - **Tabla:** `perfiles` + S3 Bucket
 
-### Módulo Comunidad ✨ NUEVO
+### Módulo Comunidad 
 
 #### 14. suscribir-usuario
 - **Endpoint:** `POST /suscribir-usuario`
 - **Descripción:** Crea/reutiliza un topic SNS y suscribe el email del usuario para notificaciones
 - **Servicio:** `Amazon SNS`
 
-### Módulo Global ✨ NUEVO
+### Módulo Global 
 
 #### 15. obtener-resumen-global
 - **Endpoint:** `GET /resumen-global`
