@@ -79,8 +79,8 @@
 
 ### Fase 10: Documentación y defensa
 - [x] Documentación técnica de backend (README por Lambda)
-- [ ] Memoria del TFG
-- [ ] Presentación
+- [x] Memoria del TFG
+- [x] Presentación
 
 ## 📅 Fechas clave
 

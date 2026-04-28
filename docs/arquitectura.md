@@ -50,11 +50,22 @@
 - Login con email y contraseña
 - Sesión persistente con tokens JWT
 - Rutas privadas protegidas en React
+- Cierre de sesión automático tras 5 minutos de inactividad
+- Manejo de cambio de contraseña requerido (`newPasswordRequired`)
 
 ### Backend
 - Funciones Lambda en Python 3.12
 - Sin servidor (serverless)
 - Escalado automático
+- 15 funciones Lambda activas organizadas por dominio (gastos, entrenamientos, metas, perfil, comunidad)
+
+### Notificaciones
+- SNS para envío de notificaciones por email
+- Topic por usuario: `dashboard-{email_sanitizado}`
+- Notificaciones automáticas cuando:
+  - Se crea un gasto que supera el presupuesto mensual
+  - Se completa una sesión de entrenamiento que alcanza la meta mensual
+- El usuario debe confirmar la suscripción desde su email
 
 ### Base de datos
 - DynamoDB para almacenamiento NoSQL
@@ -65,28 +76,25 @@
 - Acceso público de lectura
 - Subida via Lambda en base64
 
-### API
-- API Gateway REST
-- CORS habilitado en todos los endpoints
-- 15 funciones Lambda activas en backend
-
 ## Flujo de datos
 
 1. Usuario accede a la web (CloudFront + S3)
-2. Si no está autenticado, se redirige al Login (Cognito)
+2. Si no está autenticado, se redirige al Login (Cognito con restauración automática de sesión)
 3. Frontend realiza peticiones a API Gateway
 4. API Gateway invoca funciones Lambda
-5. Lambda lee/escribe en DynamoDB o S3
+5. Lambda lee/escribe en DynamoDB, S3 o envía notificaciones SNS
 6. Lambda devuelve respuesta a API Gateway
 7. Frontend muestra los datos al usuario
 
 ## Seguridad
 
 - HTTPS en todo el sistema
-- Autenticación con Amazon Cognito
+- Autenticación con Amazon Cognito con cierre por inactividad
 - IAM Roles con permisos mínimos
 - Datos encriptados en DynamoDB
 - CORS configurado en API Gateway y S3
+- Validación de campos obligatorios en todas las Lambda
+- Manejo de excepciones con logs y respuestas detalladas
 
 ## 🌐 API Endpoints
 
@@ -128,11 +136,11 @@
 | CloudFront | `EGQ2UR6H5V9UY` | CDN frontend |
 | Cognito | `eu-north-1_sY2obhHwM` | Autenticación |
 | API Gateway | `q5cdb6cw0d` | REST API |
-| DynamoDB | `gastos`, `deporte`, `perfiles`, `metas` | Base de datos |
+| DynamoDB | `gastos`, `deporte`, `perfiles`, `metas` | Almacenamiento NoSQL |
 | SNS | topics `dashboard-*` | Suscripciones por email |
 
 ## 🌍 Región
 - `eu-north-1` (Estocolmo)
 
 ## Última actualización
-10 Abril 2026 - Añadidos módulo de metas, suscripciones y resumen global
+Abril 2026 - Notificaciones SNS automáticas, cierre por inactividad, mejora de validaciones
